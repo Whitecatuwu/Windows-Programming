@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,46 +12,22 @@ namespace DrawingModel
     {
         private ShapeFactory _shapeFactory = new ShapeFactory();
         private List<Shape> _shapes = new List<Shape>();
-        private List<string[]> _shapeDatas = new List<string[]>();
-        private Dictionary<string, ShapeType> _stringToShapeType = new Dictionary<string, ShapeType>() { };
-        private Dictionary<ShapeType, string> _shapeTypeToString = new Dictionary<ShapeType, string>() { };
+        private List<Shape> _selectedShapes = new List<Shape>();
 
-        int _firstPointX;
-        int _firstPointY;
-        bool _isPressed = false;
         ShapeType _hintType = ShapeType.NULL;
         Shape _hint;
 
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler _modelAddedShape = delegate { };
-        public event ModelChangedEventHandler _modelInputError = delegate { };
-        public event ModelChangedEventHandler _modelNullShapeType = delegate { };
         public event ModelChangedEventHandler _modelRemovedShape = delegate { };
-        public event ModelChangedEventHandler _modelChanged = delegate { };
-        public event ModelChangedEventHandler _modelPointerDragging = delegate { };
+        public event ModelChangedEventHandler _modelDrawing = delegate { };
+        public event ModelChangedEventHandler _modelDrawingCompleted = delegate { };
 
-        public Model()
-        {
-            _stringToShapeType.Add("Start", ShapeType.START);
-            _stringToShapeType.Add("Terminator", ShapeType.TERMINATOR);
-            _stringToShapeType.Add("Process", ShapeType.PROCESS);
-            _stringToShapeType.Add("Decision", ShapeType.DECISION);
+        public Model() { }
 
-            _shapeTypeToString.Add(ShapeType.START, "Start");
-            _shapeTypeToString.Add(ShapeType.TERMINATOR, "Terminator");
-            _shapeTypeToString.Add(ShapeType.PROCESS, "Process");
-            _shapeTypeToString.Add(ShapeType.DECISION, "Decision");
-        }
+        public List<Shape> Shapes { get { return _shapes; } }
 
-        public List<Shape> Shapes
-        {
-            get { return _shapes; }
-        }
-
-        public List<string[]> ShapeDatas
-        {
-            get { return _shapeDatas; }
-        }
+        public List<Shape> SelectedShapes { get { return _selectedShapes; } }
 
         public ShapeType HintType
         {
@@ -58,107 +35,66 @@ namespace DrawingModel
             get { return _hintType; }
         }
 
-        public void AddShape(object shapeType, string[] inputDatas)
+        public void AddShape(in ShapeType shapeType, in string[] inputDatas)
         {
-            if (shapeType == null)
-            {
-                _modelNullShapeType();
-                return;
-            }
-            try
-            {
-                if (int.Parse(inputDatas[1].ToString()) < 0 || int.Parse(inputDatas[2].ToString()) < 0)
-                {
-                    _modelInputError();
-                    return;
-                }
-
-                if (int.Parse(inputDatas[3].ToString()) <= 0 || int.Parse(inputDatas[4].ToString()) <= 0)
-                {
-                    _modelInputError();
-                    return;
-                }              
-            }
-            catch
-            {
-                _modelInputError();
-                return;
-            }
-            Shape shape = _shapeFactory.CreateShape(_stringToShapeType[shapeType.ToString()], inputDatas);
+            Shape shape = _shapeFactory.CreateShape(shapeType, inputDatas);
             _shapes.Add(shape);
-            AddShapeData(shape);
             _modelAddedShape();
         }
 
-        private void AddShapeData(Shape shape)
-        {
-            string[] shapeData = new string[]
-            {
-                shape.Id,
-                _shapeTypeToString[shape.ShapeType],
-                shape.Text,
-                shape.X.ToString(),
-                shape.Y.ToString(),
-                shape.Height.ToString(),
-                shape.Width.ToString(),
-            }.ToArray();
-            _shapeDatas.Add(shapeData);
-        }
-
-        public void RemoveShape(int index)
+        public void RemoveShape(in int index)
         {
             _shapes.RemoveAt(index);
-            _shapeDatas.RemoveAt(index);
             _modelRemovedShape();
         }
 
-        public void PointerPressed(int x, int y)
+        public void SelectShape(in int x, in int y)
         {
-            if(_hintType == ShapeType.NULL)
-            {
-                _modelNullShapeType();
-                return;
-            }
-
-            if (x > 0 && y > 0)
-            {
-                _hint = _shapeFactory.CreateShape(_hintType, new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" });
-                _firstPointX = x;
-                _firstPointY = y;
-                _isPressed = true;
-            }
+            //
         }
 
-        public void PointerMoved(int x, int y)
+        public void SelectFirstPoint(in int x, in int y)
         {
-
-            if (_isPressed)
-            {
-                _hint.Width = Math.Max(Math.Abs(x - _firstPointX), 1);
-                _hint.Height = Math.Max(Math.Abs(y - _firstPointY), 1);
-                _modelPointerDragging();
-                _modelChanged();
-            }
+            _hint = _shapeFactory.CreateShape(_hintType, new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" });    
         }
 
-        public void PointerReleased(double x, double y)
+        public void SelectSecondPoint(in int x,int y)
         {
-            if (_isPressed)
-            {
-                _isPressed = false;
-                _shapes.Add(_hint);
-                AddShapeData(_hint);
-                _modelAddedShape();
-            }
+            _hint.Width = Math.Abs(x - _hint.X);
+            _hint.Height = Math.Abs(y - _hint.Y);
+            _modelDrawing();
         }
 
-        public void Draw(IGraphics graphics)
+        public void SelectPointCompleted(in int x, in int y) 
+        {
+            _shapes.Add(_hint);
+            _modelAddedShape();
+            _modelDrawingCompleted();
+        }
+
+        public void DrawAll(in IGraphics graphics)
         {
             graphics.ClearAll();
-            foreach (IDrawable shape in _shapes)
-                shape.Draw(graphics);
-            if (_isPressed)
-                ((IDrawable)_hint).Draw(graphics);
+            foreach (Shape shape in _shapes)
+            {
+                ((IDrawable)shape).Draw(graphics);
+                shape.DrawText(graphics);
+            }
+        }
+
+        public void DrawOne(in IGraphics graphics)
+        {
+            graphics.ClearAll();
+            ((IDrawable)_hint).Draw(graphics);
+        }
+
+        public void DrawFrames(in IGraphics graphics)
+        {
+            graphics.ClearAll();
+            foreach (Shape selectedShape in _selectedShapes)
+            {
+                selectedShape.DrawFrame(graphics);
+            }
         }
     }
 }

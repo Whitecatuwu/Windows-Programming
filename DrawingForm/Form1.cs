@@ -9,8 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+
 using DrawingModel;
-using DrawingForm;
 using DrawingForm.PresentationModel;
 using DrawingShape;
 
@@ -33,17 +33,20 @@ namespace DrawingForm
             _canvas.MouseMove += HandleCanvasPointerMoved;
             _canvas.Paint += HandleCanvasPaint;
 
-            _model._modelChanged += HandleModelChanged;
-            _model._modelRemovedShape += HandleModelChanged;
-            _model._modelAddedShape += AddGridViewRow;
-            _model._modelAddedShape += HandleModelChanged;
-            _model._modelAddedShape += delegate { Cursor = Cursors.Default; };
-            _model._modelNullShapeType += delegate { MessageBox.Show("請選擇形狀!"); };
-            _model._modelInputError += delegate { MessageBox.Show("資料輸入有誤!"); };
-            _model._modelPointerDragging += delegate { Cursor = Cursors.Cross; };
+            _model._modelRemovedShape += UpdateView;
+            _model._modelRemovedShape += RemoveGridViewRow;
+            _model._modelAddedShape += AddGridViewRow;        
+            _model._modelDrawing += UpdateView;
+            _model._modelDrawing += delegate { Cursor = Cursors.Cross; };
+            _model._modelDrawingCompleted += UpdateView;
+            _model._modelDrawingCompleted += delegate { Cursor = Cursors.Default; };
 
             _pModel = new PresentationModel.PresentationModel(_model, _canvas);
-            shapeGridView.CellClick += RemoveShape;
+            _pModel._pModelChangedMode += RefreshToolStrip;
+            _pModel._pModelGetErrorInput += delegate { MessageBox.Show("資料輸入有誤!"); };
+            _pModel._pModelGetNullShapeType += delegate { MessageBox.Show("請選擇形狀!"); };
+
+            RefreshToolStrip();
         }
         private void ShapeAddButton_Click(object sender, EventArgs e)
         {
@@ -58,17 +61,19 @@ namespace DrawingForm
             _pModel.AddShape(selectedShapeType.SelectedItem);
         }
 
-        private void RemoveShape(object sender, DataGridViewCellEventArgs e)
+        private void shapeGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && e.ColumnIndex == 0)
-            {
-                shapeGridView.Rows.RemoveAt(e.RowIndex);
-                _model.RemoveShape(e.RowIndex);
-            }
+            _pModel.ClickedAt(e.RowIndex, e.ColumnIndex);
         }
+
+        private void RemoveGridViewRow()
+        {
+            shapeGridView.Rows.RemoveAt(_pModel.RemovedShapeIndex);
+        }
+
         private void AddGridViewRow()
         {
-            string[] row = new string[] { "刪除" }.Concat(_model.ShapeDatas.Last()).ToArray();
+            string[] row = new string[] { "刪除" }.Concat(_pModel.LastShapeData).ToArray();
             shapeGridView.Rows.Add(row);
         }
 
@@ -79,25 +84,25 @@ namespace DrawingForm
 
         private void HandleCanvasPointerPressed(object sender, MouseEventArgs e)
         {
-            _model.PointerPressed(e.X, e.Y);
+            _pModel.PointerPressed(e.X, e.Y);
         }
 
         private void HandleCanvasPointerReleased(object sender, MouseEventArgs e)
         {
-            _model.PointerReleased(e.X, e.Y);
+            _pModel.PointerReleased(e.X, e.Y);
         }
 
         private void HandleCanvasPointerMoved(object sender, MouseEventArgs e)
         {
-            _model.PointerMoved(e.X, e.Y);
+            _pModel.PointerMoved(e.X, e.Y);
         }
 
         private void HandleCanvasPaint(object sender, PaintEventArgs e)
         {
-            _pModel.Draw(new PresentationModel.WindowsFormsGraphicsAdaptor(e.Graphics));
+            _pModel.Draw(new WindowsFormsGraphicsAdaptor(e.Graphics));
         }
 
-        private void HandleModelChanged()
+        private void UpdateView()
         {
             Invalidate(true);
         }
@@ -108,32 +113,32 @@ namespace DrawingForm
             toolStripTerminatorButton.Checked = _pModel.IsTerminatorEnable;
             toolStripProcessButton.Checked = _pModel.IsProcessEnable;
             toolStripDecisionButton.Checked = _pModel.IsDecisionEnable;
+            toolStripSelectButton.Checked = _pModel.IsSelectEnable;
         }
+
         private void toolStripStartButton_Click(object sender, EventArgs e)
         {
-            _pModel.setDrewingShape(ShapeType.START);
-            RefreshToolStrip();
+            _pModel.SetDrawingMode(DrawingMode.START);
         }
 
         private void toolStripTerminatorButton_Click(object sender, EventArgs e)
         {
-            _pModel.setDrewingShape(ShapeType.TERMINATOR);
-            RefreshToolStrip();
+            _pModel.SetDrawingMode(DrawingMode.TERMINATOR);
         }
+
         private void toolStripProcessButton_Click(object sender, EventArgs e)
         {
-            _pModel.setDrewingShape(ShapeType.PROCESS);
-            RefreshToolStrip();
+            _pModel.SetDrawingMode(DrawingMode.PROCESS);
         }
+
         private void toolStripDecisionButton_Click(object sender, EventArgs e)
         {
-            _pModel.setDrewingShape(ShapeType.DECISION);
-            RefreshToolStrip();
+            _pModel.SetDrawingMode(DrawingMode.DECISION);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void toolStripSelectButton_Click(object sender, EventArgs e)
         {
-
+            _pModel.SetDrawingMode(DrawingMode.SELECT);
         }
     }
 }

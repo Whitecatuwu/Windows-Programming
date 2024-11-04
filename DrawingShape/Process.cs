@@ -12,7 +12,7 @@ namespace DrawingShape
         public Process(ShapeType shapeType, string[] shapeDatas) : base(shapeType, shapeDatas) { }
         public void Draw(DrawingModel.IGraphics graphics)
         {
-            graphics.DrawProcess(_x, _y, _height, _width, _text);
+            graphics.DrawProcess(ShapeDatas);
         }
     }
 }

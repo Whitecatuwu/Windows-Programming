@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DrawingModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,7 +40,7 @@ namespace DrawingShape
         {
             get { return _shapeType; }
         }
-        public string Text 
+        public string Text
         {
             get { return _text; }
         }
@@ -47,7 +48,7 @@ namespace DrawingShape
         {
             get { return _id; }
         }
-        public int X 
+        public int X
         {
             set { _x = value; }
             get { return _x; }
@@ -68,6 +69,20 @@ namespace DrawingShape
             get { return _width; }
         }
 
+        public int[] ShapeDatas
+        {
+            get { return new int[] { _x, _y, _height, _width }; }
+        }
+
+        public void DrawFrame(IGraphics graphics)
+        {
+            graphics.DrawFrame(ShapeDatas);
+        }
+
+        public void DrawText(IGraphics graphics)
+        {
+            graphics.DrawText(ShapeDatas, _text);
+        }
     }
 }
 

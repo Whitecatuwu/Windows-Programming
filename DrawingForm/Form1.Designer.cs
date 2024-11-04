@@ -61,6 +61,7 @@
             this.toolStripTerminatorButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripProcessButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripDecisionButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSelectButton = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.shapeGridView)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -86,6 +87,7 @@
             this.shapeGridView.RowTemplate.Height = 27;
             this.shapeGridView.Size = new System.Drawing.Size(358, 358);
             this.shapeGridView.TabIndex = 0;
+            this.shapeGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.shapeGridView_CellContentClick);
             // 
             // 刪除
             // 
@@ -320,7 +322,8 @@
             this.toolStripStartButton,
             this.toolStripTerminatorButton,
             this.toolStripProcessButton,
-            this.toolStripDecisionButton});
+            this.toolStripDecisionButton,
+            this.toolStripSelectButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 27);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1193, 27);
@@ -367,6 +370,17 @@
             this.toolStripDecisionButton.Text = "Decision";
             this.toolStripDecisionButton.Click += new System.EventHandler(this.toolStripDecisionButton_Click);
             // 
+            // toolStripSelectButton
+            // 
+            this.toolStripSelectButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripSelectButton.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSelectButton.Image")));
+            this.toolStripSelectButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSelectButton.Name = "toolStripSelectButton";
+            this.toolStripSelectButton.Size = new System.Drawing.Size(29, 24);
+            this.toolStripSelectButton.Text = "Select";
+            this.toolStripSelectButton.ToolTipText = "Select";
+            this.toolStripSelectButton.Click += new System.EventHandler(this.toolStripSelectButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -391,7 +405,6 @@
             this.Controls.Add(this.dataDisplay);
             this.Controls.Add(this.menuStrip1);
             this.Name = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.shapeGridView)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -436,6 +449,7 @@
         private System.Windows.Forms.ToolStripButton toolStripTerminatorButton;
         private System.Windows.Forms.ToolStripButton toolStripProcessButton;
         private System.Windows.Forms.ToolStripButton toolStripDecisionButton;
+        private System.Windows.Forms.ToolStripButton toolStripSelectButton;
     }
 }
 
