@@ -34,20 +34,29 @@ namespace DrawingForm
             _canvas.Paint += HandleCanvasPaint;
 
             _model._modelRemovedShape += UpdateView;
-            _model._modelRemovedShape += RemoveGridViewRow;
-            _model._modelAddedShape += AddGridViewRow;        
+            _model._modelRemovedShape += RemoveGridViewRow;       
             _model._modelDrawing += UpdateView;
             _model._modelDrawing += delegate { Cursor = Cursors.Cross; };
             _model._modelDrawingCompleted += UpdateView;
             _model._modelDrawingCompleted += delegate { Cursor = Cursors.Default; };
+            _model._modelSelectedShape += UpdateView;
+            _model._modelMovingShapes += UpdateView;
 
             _pModel = new PresentationModel.PresentationModel(_model, _canvas);
             _pModel._pModelChangedMode += RefreshToolStrip;
-            _pModel._pModelGetErrorInput += delegate { MessageBox.Show("資料輸入有誤!"); };
-            _pModel._pModelGetNullShapeType += delegate { MessageBox.Show("請選擇形狀!"); };
+            _pModel._pModelGotErrorInput += delegate { MessageBox.Show("資料輸入有誤!"); };
+            _pModel._pModelGotNullShapeType += delegate { MessageBox.Show("請選擇形狀!"); };
+            _pModel._pModelMovedShapes += UpdateGridView;
+            _pModel._pModelAddedShape += AddGridViewRow;
 
             RefreshToolStrip();
         }
+
+        private void _model__modelMovingShapes()
+        {
+            throw new NotImplementedException();
+        }
+
         private void ShapeAddButton_Click(object sender, EventArgs e)
         {
             _pModel.InputDatas = new string[]
@@ -73,8 +82,17 @@ namespace DrawingForm
 
         private void AddGridViewRow()
         {
-            string[] row = new string[] { "刪除" }.Concat(_pModel.LastShapeData).ToArray();
+            int index = _pModel.UpdatedShapeIndex;
+            string[] row = new string[] { "刪除" }.Concat(_pModel.GetShapeData(index)).ToArray();
             shapeGridView.Rows.Add(row);
+        }
+
+        private void UpdateGridView()
+        {
+            int index = _pModel.UpdatedShapeIndex;
+            string[] row = new string[] { "刪除" }.Concat(_pModel.GetShapeData(index)).ToArray();
+            shapeGridView.Rows.RemoveAt(index);
+            shapeGridView.Rows.Insert(index, row);
         }
 
         /*public void HandleClearButtonClick(object sender, System.EventArgs e)

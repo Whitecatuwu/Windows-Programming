@@ -55,7 +55,7 @@ namespace DrawingShape
         }
         public int Y
         {
-            set { _x = value; }
+            set { _y = value; }
             get { return _y; }
         }
         public int Height

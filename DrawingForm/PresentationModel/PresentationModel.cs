@@ -32,18 +32,28 @@ namespace DrawingForm.PresentationModel
 
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler _pModelChangedMode = delegate { };
-        public event ModelChangedEventHandler _pModelGetNullShapeType = delegate { };
-        public event ModelChangedEventHandler _pModelGetErrorInput = delegate { };
+        public event ModelChangedEventHandler _pModelGotNullShapeType = delegate { };
+        public event ModelChangedEventHandler _pModelGotErrorInput = delegate { };
+        public event ModelChangedEventHandler _pModelMovedShapes = delegate { };
+        public event ModelChangedEventHandler _pModelAddedShape = delegate { };
 
         DrawingMode _currentDrawingMode = DrawingMode.SELECT;
         int _removedShapeIndex;
+        int _updatedShapeIndex;
+        int _preX;
+        int _preY;
         bool _isPressed = false;
         bool _isMoved = false;
 
         public PresentationModel(Model model, Control canvas)
         {
             this._model = model;
-            _model._modelDrawingCompleted += delegate { SetDrawingMode(DrawingMode.SELECT); };
+            _model._modelDrawingCompleted += delegate 
+            { 
+                SetDrawingMode(DrawingMode.SELECT);
+                _updatedShapeIndex = _model.ShapesSize - 1;
+                _pModelAddedShape();
+            };
 
             _stringToShapeType.Add("Start", ShapeType.START);
             _stringToShapeType.Add("Terminator", ShapeType.TERMINATOR);
@@ -92,22 +102,23 @@ namespace DrawingForm.PresentationModel
             get { return _removedShapeIndex; }
         }
 
-        public string[] LastShapeData
+        public int UpdatedShapeIndex
         {
-            get 
-            {
-                Shape shape = _model.Shapes.Last();
-                string[] shapeData = new string[]{
-                    shape.Id,
-                    _shapeTypeToString[shape.ShapeType],
-                    shape.Text,
-                    shape.X.ToString(),
-                    shape.Y.ToString(),
-                    shape.Height.ToString(),
-                    shape.Width.ToString(),
-                }.ToArray();
-                return shapeData;
-            }
+            get { return _updatedShapeIndex; }
+        }
+        public string[] GetShapeData(in int index)
+        {
+            Shape shape = _model.Shapes.ElementAt(index);
+            string[] shapeData = new string[]{
+                shape.Id,
+                _shapeTypeToString[shape.ShapeType],
+                shape.Text,
+                shape.X.ToString(),
+                shape.Y.ToString(),
+                shape.Height.ToString(),
+                shape.Width.ToString(),
+            }.ToArray();
+            return shapeData;
         }
 
         public void SetDrawingMode(in DrawingMode drawingMode)
@@ -116,7 +127,10 @@ namespace DrawingForm.PresentationModel
             _drawingModeSwitch[(int)drawingMode] = true;
             _currentDrawingMode = drawingMode;
             if ((int)drawingMode >= 0 && (int)drawingMode <= 3)
-                _model.HintType = (ShapeType)drawingMode;
+            {
+                _model.HintType = (ShapeType)_currentDrawingMode;
+                _model.ClearSelectedShapes();
+            }
             _pModelChangedMode();
         }
 
@@ -147,47 +161,70 @@ namespace DrawingForm.PresentationModel
         {
             if (shapeType == null)
             {
-                _pModelGetNullShapeType();
+                _pModelGotNullShapeType();
                 return;
             }
             if (!IsInputsCurrently())
             {
-                _pModelGetErrorInput();
+                _pModelGotErrorInput();
                 return;
             }
             _model.AddShape(_stringToShapeType[shapeType.ToString()], _inputDatas);
+            _updatedShapeIndex = _model.ShapesSize - 1;
+            _pModelAddedShape();
         }
 
         public void PointerPressed(in int x, in int y)
         {
+            _preX = x;
+            _preY = y;
             _isPressed = true;
             _isMoved = false;
             if (_currentDrawingMode == DrawingMode.NULL)
                 return;
             if (x <= 0 || y <= 0)
-                return;          
+                return;
             if (_currentDrawingMode == DrawingMode.SELECT)
             {
-                _model.SelectShape(x,y);
+                _model.SelectShape(x, y);
             }
             else
+            {
                 _model.SelectFirstPoint(x, y);
+            }               
         }
 
         public void PointerMoved(in int x, in int y)
         {
             _isMoved = true;
-            if (_isPressed && _currentDrawingMode != DrawingMode.SELECT)
-                _model.SelectSecondPoint(x, y);
+            if (_isPressed)
+            {
+                if (_currentDrawingMode != DrawingMode.SELECT)
+                    _model.SelectSecondPoint(x, y);
+                else
+                    _model.MoveSelectedShapes(x - _preX, y - _preY);
+                _preX = x;
+                _preY = y;
+            }
         }
 
         public void PointerReleased(in int x, in int y)
         {
-            if (_isPressed)
+            if (!_isPressed) return;
+            _isPressed = false;
+            if (_isMoved)
             {
-                _isPressed = false;
-                if (_isMoved && _currentDrawingMode != DrawingMode.SELECT)
-                    _model.SelectPointCompleted(x, y);
+                if (_currentDrawingMode != DrawingMode.SELECT)
+                    _model.SelectPointCompleted();
+                else
+                {
+                    foreach (int index in _model.SelectedShapeIndexs)
+                    {
+                        _updatedShapeIndex = index;
+                        _pModelMovedShapes();
+                    }
+                }
+
             }
         }
 
@@ -202,7 +239,7 @@ namespace DrawingForm.PresentationModel
             else if (_currentDrawingMode != DrawingMode.NULL)
             {
                 _model.DrawOne(graphics);
-            }         
+            }
         }
     }
 }
