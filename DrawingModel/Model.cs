@@ -16,10 +16,8 @@ namespace DrawingModel
 
         ShapeType _hintType = ShapeType.NULL;
         Shape _hint;
-        int _firstPointX;
-        int _firstPointY;
-        int _lastPointX;
-        int _lastPointY;
+        int _firstPointX = 0;
+        int _firstPointY = 0;
 
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler _modelAddedShape = delegate { };
@@ -91,13 +89,21 @@ namespace DrawingModel
 
         public void SelectFirstPoint(in int x, in int y)
         {
-            _hint = _shapeFactory.CreateShape(_hintType, new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" });
+            _firstPointX = x;
+            _firstPointY = y;
         }
 
         public void SelectSecondPoint(in int x, int y)
         {
             if (_hint == null)
-                return;
+            {
+                if (_firstPointX - x != 0 && _firstPointY - y != 0)
+                {
+                    string[] shapeData = new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" };
+                    _hint = _shapeFactory.CreateShape(_hintType, shapeData);
+                }
+                else return;
+            }
             _hint.Width = Math.Abs(x - _hint.X);
             _hint.Height = Math.Abs(y - _hint.Y);
             _modelDrawing();
@@ -105,9 +111,13 @@ namespace DrawingModel
 
         public void SelectPointCompleted()
         {
-            _shapes.Add(_hint);
-            _modelAddedShape();
-            _modelDrawingCompleted();
+            if (_hint != null)
+            {
+                _shapes.Add(_hint);
+                _hint = null;
+                _modelAddedShape();
+                _modelDrawingCompleted();
+            }
         }
 
         public void DrawAll(in IGraphics graphics)
