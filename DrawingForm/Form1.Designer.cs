@@ -183,6 +183,7 @@
             this.TextBoxX.Size = new System.Drawing.Size(32, 25);
             this.TextBoxX.TabIndex = 3;
             this.TextBoxX.Text = " ";
+            this.TextBoxX.TextChanged += new System.EventHandler(this.TextBoxX_TextChanged);
             // 
             // TextBoxY
             // 
@@ -191,6 +192,7 @@
             this.TextBoxY.Size = new System.Drawing.Size(32, 25);
             this.TextBoxY.TabIndex = 4;
             this.TextBoxY.Text = " ";
+            this.TextBoxY.TextChanged += new System.EventHandler(this.TextBoxY_TextChanged);
             // 
             // TextBoxH
             // 
@@ -199,6 +201,7 @@
             this.TextBoxH.Size = new System.Drawing.Size(32, 25);
             this.TextBoxH.TabIndex = 5;
             this.TextBoxH.Text = " ";
+            this.TextBoxH.TextChanged += new System.EventHandler(this.TextBoxH_TextChanged);
             // 
             // TextBoxW
             // 
@@ -207,10 +210,12 @@
             this.TextBoxW.Size = new System.Drawing.Size(32, 25);
             this.TextBoxW.TabIndex = 6;
             this.TextBoxW.Text = " ";
+            this.TextBoxW.TextChanged += new System.EventHandler(this.TextBoxW_TextChanged);
             // 
             // labelText
             // 
             this.labelText.AutoSize = true;
+            this.labelText.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.labelText.Location = new System.Drawing.Point(963, 92);
             this.labelText.Name = "labelText";
             this.labelText.Size = new System.Drawing.Size(37, 15);
@@ -220,6 +225,7 @@
             // labelX
             // 
             this.labelX.AutoSize = true;
+            this.labelX.ForeColor = System.Drawing.Color.Red;
             this.labelX.Location = new System.Drawing.Point(1031, 92);
             this.labelX.Name = "labelX";
             this.labelX.Size = new System.Drawing.Size(17, 15);
@@ -229,7 +235,8 @@
             // labelY
             // 
             this.labelY.AutoSize = true;
-            this.labelY.Location = new System.Drawing.Point(1069, 92);
+            this.labelY.ForeColor = System.Drawing.Color.Red;
+            this.labelY.Location = new System.Drawing.Point(1067, 92);
             this.labelY.Name = "labelY";
             this.labelY.Size = new System.Drawing.Size(17, 15);
             this.labelY.TabIndex = 9;
@@ -238,6 +245,7 @@
             // labelH
             // 
             this.labelH.AutoSize = true;
+            this.labelH.ForeColor = System.Drawing.Color.Red;
             this.labelH.Location = new System.Drawing.Point(1100, 92);
             this.labelH.Name = "labelH";
             this.labelH.Size = new System.Drawing.Size(17, 15);
@@ -247,6 +255,7 @@
             // labelW
             // 
             this.labelW.AutoSize = true;
+            this.labelW.ForeColor = System.Drawing.Color.Red;
             this.labelW.Location = new System.Drawing.Point(1134, 92);
             this.labelW.Name = "labelW";
             this.labelW.Size = new System.Drawing.Size(20, 15);

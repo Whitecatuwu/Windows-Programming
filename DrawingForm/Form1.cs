@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 using DrawingModel;
 using DrawingForm.PresentationModel;
 using DrawingShape;
+using DrawingState;
 
 namespace DrawingForm
 {
@@ -33,28 +34,26 @@ namespace DrawingForm
             _canvas.MouseMove += HandleCanvasPointerMoved;
             _canvas.Paint += HandleCanvasPaint;
 
-            _model._modelRemovedShape += UpdateView;
-            _model._modelRemovedShape += RemoveGridViewRow;       
-            _model._modelDrawing += UpdateView;
-            _model._modelDrawing += delegate { Cursor = Cursors.Cross; };
-            _model._modelDrawingCompleted += UpdateView;
-            _model._modelDrawingCompleted += delegate { Cursor = Cursors.Default; };
-            _model._modelSelectedShape += UpdateView;
-            _model._modelMovingShapes += UpdateView;
+            _model.AddedShapeEvent += AddGridViewRow;
+            _model.AddedShapeEvent += UpdateView;
+            _model.RemovedShapeEvent += UpdateView;
+            _model.RemovedShapeEvent += RemoveGridViewRow;
+            _model.SelectingCompletedEvent += UpdateView;
+            _model.SelectingCompletedEvent += delegate { Cursor = Cursors.Default; };
+            _model.SelectingEvent += UpdateView;
+            _model.SelectingEvent += delegate { Cursor = Cursors.Cross; };
+            _model.SelectedShapeEvent += UpdateView;
+            _model.MovedShapesEvent += UpdateGridView;
+            _model.MovingShapesEvent += UpdateView;
 
-            _pModel = new PresentationModel.PresentationModel(_model, _canvas);
-            _pModel._pModelChangedMode += RefreshToolStrip;
-            _pModel._pModelGotErrorInput += delegate { MessageBox.Show("資料輸入有誤!"); };
-            _pModel._pModelGotNullShapeType += delegate { MessageBox.Show("請選擇形狀!"); };
-            _pModel._pModelMovedShapes += UpdateGridView;
-            _pModel._pModelAddedShape += AddGridViewRow;
+            _pModel = new PresentationModel.PresentationModel(_model);
+            _pModel.ChangedModeEvent += RefreshToolStrip;
+            _pModel.GotErrorInputEvent += delegate { MessageBox.Show("資料輸入有誤!"); };
+            _pModel.GotNullShapeTypeEvent += delegate { MessageBox.Show("請選擇形狀!"); };
+
+            ShapeAddButton.DataBindings.Add("Enabled", _pModel, "IsAddButtonEnabled");
 
             RefreshToolStrip();
-        }
-
-        private void _model__modelMovingShapes()
-        {
-            throw new NotImplementedException();
         }
 
         private void ShapeAddButton_Click(object sender, EventArgs e)
@@ -72,24 +71,27 @@ namespace DrawingForm
 
         private void shapeGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            _pModel.ClickedAt(e.RowIndex, e.ColumnIndex);
+            if (e.RowIndex >= 0 && e.ColumnIndex == 0)
+            {
+                _model.RemoveShape(e.RowIndex);
+            }
         }
 
         private void RemoveGridViewRow()
         {
-            shapeGridView.Rows.RemoveAt(_pModel.RemovedShapeIndex);
+            shapeGridView.Rows.RemoveAt(_model.RemovedShapeIndex);
         }
 
         private void AddGridViewRow()
         {
-            int index = _pModel.UpdatedShapeIndex;
+            int index = _model.ShapesSize - 1;
             string[] row = new string[] { "刪除" }.Concat(_pModel.GetShapeData(index)).ToArray();
             shapeGridView.Rows.Add(row);
         }
 
         private void UpdateGridView()
         {
-            int index = _pModel.UpdatedShapeIndex;
+            int index = _model.UpdatedShapeIndex;
             string[] row = new string[] { "刪除" }.Concat(_pModel.GetShapeData(index)).ToArray();
             shapeGridView.Rows.RemoveAt(index);
             shapeGridView.Rows.Insert(index, row);
@@ -102,22 +104,22 @@ namespace DrawingForm
 
         private void HandleCanvasPointerPressed(object sender, MouseEventArgs e)
         {
-            _pModel.PointerPressed(e.X, e.Y);
+            _model.MouseDown(e.X, e.Y);
         }
 
         private void HandleCanvasPointerReleased(object sender, MouseEventArgs e)
         {
-            _pModel.PointerReleased(e.X, e.Y);
+            _model.MouseUp(e.X, e.Y);
         }
 
         private void HandleCanvasPointerMoved(object sender, MouseEventArgs e)
         {
-            _pModel.PointerMoved(e.X, e.Y);
+            _model.MouseMove(e.X, e.Y);
         }
 
         private void HandleCanvasPaint(object sender, PaintEventArgs e)
         {
-            _pModel.Draw(new WindowsFormsGraphicsAdaptor(e.Graphics));
+            _model.OnPaint(new WindowsFormsGraphicsAdaptor(e.Graphics));
         }
 
         private void UpdateView()
@@ -156,7 +158,44 @@ namespace DrawingForm
 
         private void toolStripSelectButton_Click(object sender, EventArgs e)
         {
-            _pModel.SetDrawingMode(DrawingMode.SELECT);
+            _pModel.SetDrawingMode(DrawingMode.POINTER);
+        }
+
+        private void TextBoxText_TextChanged(object sender, EventArgs e)
+        {
+            //nothing
+        }
+
+        private void TextBoxX_TextChanged(object sender, EventArgs e)
+        {
+            if (_pModel.CheckInput(1, ((TextBox)sender).Text))
+                labelX.ForeColor = Color.Black;
+            else
+                labelX.ForeColor = Color.Red;
+        }
+
+        private void TextBoxY_TextChanged(object sender, EventArgs e)
+        {
+            if (_pModel.CheckInput(2, ((TextBox)sender).Text))
+                labelY.ForeColor = Color.Black;
+            else
+                labelY.ForeColor = Color.Red;
+        }
+
+        private void TextBoxH_TextChanged(object sender, EventArgs e)
+        {
+            if (_pModel.CheckInput(3, ((TextBox)sender).Text))
+                labelH.ForeColor = Color.Black;
+            else
+                labelH.ForeColor = Color.Red;
+        }
+
+        private void TextBoxW_TextChanged(object sender, EventArgs e)
+        {
+            if (_pModel.CheckInput(4, ((TextBox)sender).Text))
+                labelW.ForeColor = Color.Black;
+            else
+                labelW.ForeColor = Color.Red;
         }
     }
 }

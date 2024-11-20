@@ -55,6 +55,15 @@
     <Compile Include="..\DrawingModel\ShapeFactory.cs">
       <Link>Model\ShapeFactory.cs</Link>
     </Compile>
+    <Compile Include="..\DrawingModel\State\DrawingState.cs">
+      <Link>State\DrawingState.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\State\IState.cs">
+      <Link>State\IState.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\State\PointerState.cs">
+      <Link>State\PointerState.cs</Link>
+    </Compile>
     <Compile Include="..\DrawingShape\Decision.cs">
       <Link>Shapes\Decision.cs</Link>
     </Compile>

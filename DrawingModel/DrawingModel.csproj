@@ -63,6 +63,10 @@
     <Compile Include="Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShapeFactory.cs" />
+    <Compile Include="State\DrawingState.cs" />
+    <Compile Include="State\IState.cs" />
+    <Compile Include="State\PointerState.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

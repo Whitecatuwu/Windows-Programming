@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Drawing;
 using DrawingModel;
 using DrawingShape;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace DrawingForm.PresentationModel
 {
@@ -18,43 +17,34 @@ namespace DrawingForm.PresentationModel
         TERMINATOR = 1,
         PROCESS = 2,
         DECISION = 3,
-        SELECT = 4
+        POINTER = 4
     }
-    class PresentationModel
+    class PresentationModel : INotifyPropertyChanged
     {
         Model _model;
 
         private string[] _inputDatas = new string[5]; // Text, X, Y, H, W
+        bool[] _inputCorrectlyBools = new bool[5] { true, false, false, false, false };// Text, X, Y, H, W
         bool[] _drawingModeSwitch = new bool[5] { false, false, false, false, true };
 
         private Dictionary<string, ShapeType> _stringToShapeType = new Dictionary<string, ShapeType>() { };
         private Dictionary<ShapeType, string> _shapeTypeToString = new Dictionary<ShapeType, string>() { };
 
+        public event PropertyChangedEventHandler PropertyChanged;
         public delegate void ModelChangedEventHandler();
-        public event ModelChangedEventHandler _pModelChangedMode = delegate { };
-        public event ModelChangedEventHandler _pModelGotNullShapeType = delegate { };
-        public event ModelChangedEventHandler _pModelGotErrorInput = delegate { };
-        public event ModelChangedEventHandler _pModelMovedShapes = delegate { };
-        public event ModelChangedEventHandler _pModelAddedShape = delegate { };
+        public event ModelChangedEventHandler ChangedModeEvent = delegate { };
+        public event ModelChangedEventHandler GotNullShapeTypeEvent = delegate { };
+        public event ModelChangedEventHandler GotErrorInputEvent = delegate { };
 
-        DrawingMode _currentDrawingMode = DrawingMode.SELECT;
-        int _removedShapeIndex;
-        int _updatedShapeIndex;
-        int _preX;
-        int _preY;
-        bool _isPressed = false;
-        bool _isMoved = false;
+        DrawingMode _currentDrawingMode = DrawingMode.POINTER;
 
-        public PresentationModel(Model model, Control canvas)
+        public PresentationModel(Model model)
         {
             this._model = model;
-            _model._modelDrawingCompleted += delegate 
-            { 
-                SetDrawingMode(DrawingMode.SELECT);
-                _updatedShapeIndex = _model.ShapesSize - 1;
-                _pModelAddedShape();
-            };
+            _model.SelectingCompletedEvent += delegate { SetDrawingMode(DrawingMode.POINTER); };
 
+            /*來自view輸入的資料型態為string，而model創建形狀所需的參數不全為string，
+             資料型態轉換及判斷輸入的部分在PresentationModel實現。*/
             _stringToShapeType.Add("Start", ShapeType.START);
             _stringToShapeType.Add("Terminator", ShapeType.TERMINATOR);
             _stringToShapeType.Add("Process", ShapeType.PROCESS);
@@ -65,7 +55,7 @@ namespace DrawingForm.PresentationModel
             _shapeTypeToString.Add(ShapeType.PROCESS, "Process");
             _shapeTypeToString.Add(ShapeType.DECISION, "Decision");
         }
-
+        //------------Switch------------
         public string[] InputDatas
         {
             set { _inputDatas = value; }
@@ -96,16 +86,13 @@ namespace DrawingForm.PresentationModel
         {
             get { return _drawingModeSwitch[4]; }
         }
+        //------------------------
 
-        public int RemovedShapeIndex
+        public bool IsAddButtonEnabled
         {
-            get { return _removedShapeIndex; }
+            get { return _inputCorrectlyBools.All(b => b); }
         }
 
-        public int UpdatedShapeIndex
-        {
-            get { return _updatedShapeIndex; }
-        }
         public string[] GetShapeData(in int index)
         {
             Shape shape = _model.Shapes.ElementAt(index);
@@ -126,120 +113,50 @@ namespace DrawingForm.PresentationModel
             _drawingModeSwitch[(int)_currentDrawingMode] = false;
             _drawingModeSwitch[(int)drawingMode] = true;
             _currentDrawingMode = drawingMode;
-            if ((int)drawingMode >= 0 && (int)drawingMode <= 3)
+
+            if (drawingMode == DrawingMode.POINTER)
             {
-                _model.HintType = (ShapeType)_currentDrawingMode;
-                _model.ClearSelectedShapes();
+                _model.EnterPointerState();
             }
-            _pModelChangedMode();
+            else if (drawingMode != DrawingMode.NULL)
+            {
+                _model.EnterDrawingState((ShapeType)drawingMode);
+            }
+
+            ChangedModeEvent();
         }
 
-        public void ClickedAt(in int r, in int c)
+        public bool CheckInput(in int index, in string data)
         {
-            if (r >= 0 && c == 0)
+            if (index < 1 || index > 4) return false;
+            _inputDatas[index] = data;
+            try
             {
-                _removedShapeIndex = r;
-                _model.RemoveShape(r);
+                _inputCorrectlyBools[index] = (int.Parse(_inputDatas[index]) > 0);
             }
-        }
-
-        private bool IsInputsCurrently()
-        {
-            for (int i = 1; i < 5; i++)
+            catch (Exception)
             {
-                try
-                {
-                    if (int.Parse(_inputDatas[i]) <= 0)
-                        return false;
-                }
-                catch { return false; }
+                return false;
             }
-            return true;
+            Notify("IsAddButtonEnabled");    
+            return _inputCorrectlyBools[index];
         }
 
         public void AddShape(in object shapeType)
         {
+            //for DataGridView adding shape.
             if (shapeType == null)
             {
-                _pModelGotNullShapeType();
+                GotNullShapeTypeEvent();
                 return;
             }
-            if (!IsInputsCurrently())
-            {
-                _pModelGotErrorInput();
-                return;
-            }
+         
             _model.AddShape(_stringToShapeType[shapeType.ToString()], _inputDatas);
-            _updatedShapeIndex = _model.ShapesSize - 1;
-            _pModelAddedShape();
         }
-
-        public void PointerPressed(in int x, in int y)
+        private void Notify(string propertyName)
         {
-            _preX = x;
-            _preY = y;
-            _isPressed = true;
-            _isMoved = false;
-            if (_currentDrawingMode == DrawingMode.NULL)
-                return;
-            if (x <= 0 || y <= 0)
-                return;
-            if (_currentDrawingMode == DrawingMode.SELECT)
-            {
-                _model.SelectShape(x, y);
-            }
-            else
-            {
-                _model.SelectFirstPoint(x, y);
-            }               
-        }
-
-        public void PointerMoved(in int x, in int y)
-        {
-            _isMoved = true;
-            if (_isPressed)
-            {
-                if (_currentDrawingMode != DrawingMode.SELECT)
-                    _model.SelectSecondPoint(x, y);
-                else
-                    _model.MoveSelectedShapes(x - _preX, y - _preY);
-                _preX = x;
-                _preY = y;
-            }
-        }
-
-        public void PointerReleased(in int x, in int y)
-        {
-            if (!_isPressed) return;
-            _isPressed = false;
-            if (_isMoved)
-            {
-                if (_currentDrawingMode != DrawingMode.SELECT)
-                    _model.SelectPointCompleted();
-                else
-                {
-                    foreach (int index in _model.SelectedShapeIndexs)
-                    {
-                        _updatedShapeIndex = index;
-                        _pModelMovedShapes();
-                    }
-                }
-
-            }
-        }
-
-        public void Draw(in IGraphics graphics)
-        {
-            if (graphics == null) { return; }
-            _model.DrawAll(graphics);
-            if (_currentDrawingMode == DrawingMode.SELECT)
-            {
-                _model.DrawFrames(graphics);
-            }
-            else if (_currentDrawingMode != DrawingMode.NULL)
-            {
-                _model.DrawOne(graphics);
-            }
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

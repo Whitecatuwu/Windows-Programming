@@ -14,5 +14,11 @@ namespace DrawingShape
         {
             graphics.DrawProcess(ShapeDatas);
         }
+        public bool IsPointInRange(int x, int y)
+        {
+            int rx = this._x + Width;
+            int ry = this._y + Height;
+            return (x <= rx && x >= this._x) && (y <= ry && y >= this._y);
+        }
     }
 }

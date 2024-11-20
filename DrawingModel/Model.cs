@@ -1,41 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 using DrawingShape;
+using DrawingState;
+using System.ComponentModel;
 
 namespace DrawingModel
 {
-    internal class Model
+    public class Model : INotifyPropertyChanged
     {
-        private ShapeFactory _shapeFactory = new ShapeFactory();
-        private List<Shape> _shapes = new List<Shape>();
-        private HashSet<int> _selectedShapeIndexs = new HashSet<int>();
+        ShapeFactory _shapeFactory = new ShapeFactory();
+        List<Shape> _shapes = new List<Shape>();
 
-        ShapeType _hintType = ShapeType.NULL;
-        Shape _hint;
-        int _firstPointX = 0;
-        int _firstPointY = 0;
+        PointerState _pointerState;
+        DrawingState.DrawingState _drawingState;
+        IState _currentState;
 
+        int _removedShapeIndex;
+        int _updatedShapeIndex;
+
+        public event PropertyChangedEventHandler PropertyChanged;
         public delegate void ModelChangedEventHandler();
-        public event ModelChangedEventHandler _modelAddedShape = delegate { };
-        public event ModelChangedEventHandler _modelRemovedShape = delegate { };
-        public event ModelChangedEventHandler _modelDrawing = delegate { };
-        public event ModelChangedEventHandler _modelDrawingCompleted = delegate { };
-        public event ModelChangedEventHandler _modelSelectedShape = delegate { };
-        public event ModelChangedEventHandler _modelMovingShapes = delegate { };
+        public event ModelChangedEventHandler AddedShapeEvent = delegate { };
+        public event ModelChangedEventHandler RemovedShapeEvent = delegate { };
+        public event ModelChangedEventHandler MovingShapesEvent = delegate { };
+        public event ModelChangedEventHandler MovedShapesEvent = delegate { };
+        public event ModelChangedEventHandler SelectedShapeEvent = delegate { };
+        public event ModelChangedEventHandler SelectingCompletedEvent = delegate { };
+        public event ModelChangedEventHandler SelectingEvent = delegate { };
 
-        public Model() { }
-        public List<Shape> Shapes
+
+        public Model()
         {
-            get { return _shapes; }
+            _pointerState = new PointerState();
+            _drawingState = new DrawingState.DrawingState((PointerState)_pointerState);
+
+            _pointerState.SelectedShapeEvent += delegate { SelectedShapeEvent(); };
+            _pointerState.MovingShapesEvent += delegate { MovingShapesEvent(); };
+            _pointerState.MovedShapesEvent += delegate { MovedShapesEvent(); };
+
+            _drawingState.SelectingEvent += delegate { SelectingEvent(); };
+            _drawingState.SelectingCompletedEvent += delegate { SelectingCompletedEvent(); };
+
+            EnterPointerState();
         }
 
-        public HashSet<int> SelectedShapeIndexs
+        public IList<Shape> Shapes
         {
-            get { return _selectedShapeIndexs; }
+            get { return _shapes.AsReadOnly(); }
         }
 
         public int ShapesSize
@@ -43,106 +58,68 @@ namespace DrawingModel
             get { return _shapes.Count(); }
         }
 
-        public ShapeType HintType
+        public int RemovedShapeIndex
         {
-            set { _hintType = value; }
-            get { return _hintType; }
+            get { return _removedShapeIndex; }
         }
 
-        public void ClearSelectedShapes() { _selectedShapeIndexs.Clear(); }
+        public int UpdatedShapeIndex
+        {
+            set { _updatedShapeIndex = value; }
+            get { return _updatedShapeIndex; }
+        }
+
+        public void EnterPointerState()
+        {
+            _pointerState.Initialize(this);
+            _currentState = _pointerState;
+        }
+
+        public void EnterDrawingState(ShapeType shapeType)
+        {
+            _drawingState.Initialize(this);
+            _drawingState.HintShapeType = shapeType;
+            _currentState = _drawingState;
+        }
+
+        public void MouseDown(int x, int y)
+        {
+            _currentState.MouseDown(this, x, y);
+        }
+
+        public void MouseMove(int x, int y)
+        {
+            _currentState.MouseMove(this, x, y);
+        }
+
+        public void MouseUp(int x, int y)
+        {
+            _currentState.MouseUp(this, x, y);
+        }
+
+        public void OnPaint(IGraphics g)
+        {
+            _currentState.OnPaint(this, g);
+        }
 
         public void AddShape(in ShapeType shapeType, in string[] inputDatas)
         {
             Shape shape = _shapeFactory.CreateShape(shapeType, inputDatas);
             _shapes.Add(shape);
-            _modelAddedShape();
+            AddedShapeEvent();
+        }
+
+        public void AddShape(Shape shape)
+        {
+            _shapes.Add(shape);
+            AddedShapeEvent();
         }
 
         public void RemoveShape(in int index)
         {
             _shapes.RemoveAt(index);
-            _modelRemovedShape();
-        }
-
-        public void SelectShape(in int x, in int y)
-        {
-            for (int i = 0; i < _shapes.Count(); i++)
-            {
-                Shape shape = _shapes[i];
-                bool isXInRange = (x >= shape.X) && (x <= shape.X + shape.Width);
-                bool isYInRange = (y >= shape.Y) && (y <= shape.Y + shape.Height);
-                if (isXInRange && isYInRange)
-                    _selectedShapeIndexs.Add(i);
-            }
-            _modelSelectedShape();
-        }
-
-        public void MoveSelectedShapes(in int dx, in int dy)
-        {
-            foreach (int index in _selectedShapeIndexs)
-            {
-                _shapes[index].X += dx;
-                _shapes[index].Y += dy;
-            }
-            _modelMovingShapes();
-        }
-
-        public void SelectFirstPoint(in int x, in int y)
-        {
-            _firstPointX = x;
-            _firstPointY = y;
-        }
-
-        public void SelectSecondPoint(in int x, int y)
-        {
-            if (_hint == null)
-            {
-                if (_firstPointX - x != 0 && _firstPointY - y != 0)
-                {
-                    string[] shapeData = new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" };
-                    _hint = _shapeFactory.CreateShape(_hintType, shapeData);
-                }
-                else return;
-            }
-            _hint.Width = Math.Abs(x - _hint.X);
-            _hint.Height = Math.Abs(y - _hint.Y);
-            _modelDrawing();
-        }
-
-        public void SelectPointCompleted()
-        {
-            if (_hint != null)
-            {
-                _shapes.Add(_hint);
-                _hint = null;
-                _modelAddedShape();
-                _modelDrawingCompleted();
-            }
-        }
-
-        public void DrawAll(in IGraphics graphics)
-        {
-            graphics.ClearAll();
-            foreach (Shape shape in _shapes)
-            {
-                ((IDrawable)shape).Draw(graphics);
-                shape.DrawText(graphics);
-            }
-        }
-
-        public void DrawOne(in IGraphics graphics)
-        {
-            graphics.ClearAll();
-            ((IDrawable)_hint).Draw(graphics);
-        }
-
-        public void DrawFrames(in IGraphics graphics)
-        {
-            graphics.ClearAll();
-            foreach (int index in _selectedShapeIndexs)
-            {
-                _shapes[index].DrawFrame(graphics);
-            }
+            _removedShapeIndex = index;
+            RemovedShapeEvent();
         }
     }
 }

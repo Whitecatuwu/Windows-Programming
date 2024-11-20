@@ -1,9 +1,6 @@
 ﻿using DrawingModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 
 namespace DrawingShape
 {
@@ -15,7 +12,7 @@ namespace DrawingShape
         PROCESS = 2,
         DECISION = 3
     }
-    abstract internal class Shape
+    abstract public class Shape
     {
         public Shape(ShapeType shapeType, string[] shapeDatas)
         {
@@ -82,6 +79,23 @@ namespace DrawingShape
         public void DrawText(IGraphics graphics)
         {
             graphics.DrawText(ShapeDatas, _text);
+        }
+
+        public void Normalize()
+        {
+            if(_x < 0) _x = 0;
+            if(_y < 0) _y = 0;
+
+            if (_width < 0)
+            {
+                _x += _width;
+                _width = -_width;
+            }
+            if (_height < 0)
+            {
+                _y += _height;
+                _height = -_height;
+            }
         }
     }
 }
