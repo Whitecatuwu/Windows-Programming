@@ -7,8 +7,8 @@ namespace DrawingState
     internal class DrawingState : IState
     {
         public delegate void ModelChangedEventHandler();
-        public event ModelChangedEventHandler SelectingEvent = delegate { };
-        public event ModelChangedEventHandler SelectingCompletedEvent = delegate { };
+        public event ModelChangedEventHandler _selectingEvent = delegate { };
+        public event ModelChangedEventHandler _selectingCompletedEvent = delegate { };
 
         const int SHIFT_KEY = 160;
         int _firstX;
@@ -62,12 +62,12 @@ namespace DrawingState
 
             if (_hint == null || _hint.Height == 0 || _hint.Width == 0)
             {
-                SelectingCompletedEvent();
+                _selectingCompletedEvent();
                 return;
             }
             _hint.Normalize();
             m.AddShape(_hint);
-            SelectingCompletedEvent();
+            _selectingCompletedEvent();
             _pointerState.AddSelectedShape(_hint);
         }
 
@@ -103,8 +103,9 @@ namespace DrawingState
 
         private void DrawHint(int x, int y)
         {
-            if (_hint == null && _hintShapeType != ShapeType.NULL)
+            if (_hint == null)
             {
+                if (_hintShapeType == ShapeType.NULL) return;
                 string[] shapeData = new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" };
                 _hint = _shapeFactory.CreateShape(_hintShapeType, shapeData);
             }
@@ -125,7 +126,7 @@ namespace DrawingState
                 _hint.Width = dx;
                 _hint.Height = dy;
             }
-            SelectingEvent();
+            _selectingEvent();
         }
     }
 }

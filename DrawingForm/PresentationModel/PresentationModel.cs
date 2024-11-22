@@ -19,9 +19,9 @@ namespace DrawingForm.PresentationModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public delegate void ModelChangedEventHandler();
-        public event ModelChangedEventHandler ChangedModeEvent = delegate { };
-        public event ModelChangedEventHandler GotNullShapeTypeEvent = delegate { };
-        public event ModelChangedEventHandler GotErrorInputEvent = delegate { };
+        public event ModelChangedEventHandler _changedModeEvent = delegate { };
+        public event ModelChangedEventHandler _gotNullShapeTypeEvent = delegate { };
+        public event ModelChangedEventHandler _gotErrorInputEvent = delegate { };
 
         Model _model;
         Praser _praser = new Praser();
@@ -37,7 +37,7 @@ namespace DrawingForm.PresentationModel
         public PresentationModel(Model model)
         {
             this._model = model;
-            _model.SelectingCompletedEvent += delegate { SetDrawingMode(DrawingMode.POINTER); };
+            _model._selectingCompletedEvent += delegate { SetDrawingMode(DrawingMode.POINTER); };
         }
         //------------Switch------------
         public bool IsStartEnable
@@ -127,7 +127,7 @@ namespace DrawingForm.PresentationModel
                 _model.EnterDrawingState((ShapeType)drawingMode);
             }
 
-            ChangedModeEvent();
+            _changedModeEvent();
         }
 
         public void InputData(in int index, in string data)
@@ -143,7 +143,7 @@ namespace DrawingForm.PresentationModel
             //for DataGridView adding shape.
             if (shapeType == null)
             {
-                GotNullShapeTypeEvent();
+                _gotNullShapeTypeEvent();
                 return;
             } 
             _model.AddShape(_praser.ToShapeType(shapeType.ToString()), _inputedDatas);

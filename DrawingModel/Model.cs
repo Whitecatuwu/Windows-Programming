@@ -11,13 +11,13 @@ namespace DrawingModel
         //public event PropertyChangedEventHandler PropertyChanged;
 
         public delegate void ModelChangedEventHandler();
-        public event ModelChangedEventHandler AddedShapeEvent = delegate { };
-        public event ModelChangedEventHandler RemovedShapeEvent = delegate { };
-        public event ModelChangedEventHandler MovingShapesEvent = delegate { };
-        public event ModelChangedEventHandler MovedShapesEvent = delegate { };
-        public event ModelChangedEventHandler SelectedShapeEvent = delegate { };
-        public event ModelChangedEventHandler SelectingCompletedEvent = delegate { };
-        public event ModelChangedEventHandler SelectingEvent = delegate { };
+        public event ModelChangedEventHandler _addedShapeEvent = delegate { };
+        public event ModelChangedEventHandler _removedShapeEvent = delegate { };
+        public event ModelChangedEventHandler _movingShapesEvent = delegate { };
+        public event ModelChangedEventHandler _movedShapesEvent = delegate { };
+        public event ModelChangedEventHandler _selectedShapeEvent = delegate { };
+        public event ModelChangedEventHandler _selectingCompletedEvent = delegate { };
+        public event ModelChangedEventHandler _selectingEvent = delegate { };
 
         ShapeFactory _shapeFactory = new ShapeFactory();
         List<Shape> _shapes = new List<Shape>();
@@ -34,12 +34,12 @@ namespace DrawingModel
             _pointerState = new PointerState();
             _drawingState = new DrawingState.DrawingState(_pointerState);
 
-            _pointerState.SelectedShapeEvent += delegate { SelectedShapeEvent(); };
-            _pointerState.MovingShapesEvent += delegate { MovingShapesEvent(); };
-            _pointerState.MovedShapesEvent += delegate { MovedShapesEvent(); };
+            _pointerState._selectedShapeEvent += delegate { _selectedShapeEvent(); };
+            _pointerState._movingShapesEvent += delegate { _movingShapesEvent(); };
+            _pointerState._movedShapesEvent += delegate { _movedShapesEvent(); };
 
-            _drawingState.SelectingEvent += delegate { SelectingEvent(); };
-            _drawingState.SelectingCompletedEvent += delegate { SelectingCompletedEvent(); };
+            _drawingState._selectingEvent += delegate { _selectingEvent(); };
+            _drawingState._selectingCompletedEvent += delegate { _selectingCompletedEvent(); };
 
             EnterPointerState();
         }
@@ -102,13 +102,13 @@ namespace DrawingModel
         {
             Shape shape = _shapeFactory.CreateShape(shapeType, inputDatas);
             _shapes.Add(shape);
-            AddedShapeEvent();
+            _addedShapeEvent();
         }
 
         public void AddShape(in Shape shape)
         {
             _shapes.Add(shape);
-            AddedShapeEvent();
+            _addedShapeEvent();
         }
 
         public void RemoveShape(in int index)
@@ -116,7 +116,7 @@ namespace DrawingModel
             _pointerState.RemoveSelectedShape(_shapes[index]);
             _shapes.RemoveAt(index);
             _removedShapeIndex = index;
-            RemovedShapeEvent();
+            _removedShapeEvent();
         }
     }
 }

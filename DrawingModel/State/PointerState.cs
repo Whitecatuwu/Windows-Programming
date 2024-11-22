@@ -7,9 +7,9 @@ namespace DrawingState
     public class PointerState : IState
     {
         public delegate void ModelChangedEventHandler();
-        public event ModelChangedEventHandler MovingShapesEvent = delegate { };
-        public event ModelChangedEventHandler MovedShapesEvent = delegate { };
-        public event ModelChangedEventHandler SelectedShapeEvent = delegate { };
+        public event ModelChangedEventHandler _movingShapesEvent = delegate { };
+        public event ModelChangedEventHandler _movedShapesEvent = delegate { };
+        public event ModelChangedEventHandler _selectedShapeEvent = delegate { };
 
         SortedSet<Shape> _selectedShapes = new SortedSet<Shape>();
         const int CTRL_KEY = 17;
@@ -49,19 +49,19 @@ namespace DrawingState
         public void AddSelectedShape(Shape shape)
         {
             _selectedShapes.Add(shape);
-            SelectedShapeEvent();
+            _selectedShapeEvent();
         }
 
         public void RemoveSelectedShape(Shape shape)
         {
             if (_selectedShapes.Remove(shape))
-                SelectedShapeEvent();
+                _selectedShapeEvent();
         }
 
         public void ClearSelectedShapes()
         {
             _selectedShapes.Clear();
-            SelectedShapeEvent();
+            _selectedShapeEvent();
         }
 
         public void MouseMove(Model m, int x, int y)
@@ -77,7 +77,7 @@ namespace DrawingState
 
             _preX = x;
             _preY = y;
-            MovingShapesEvent();
+            _movingShapesEvent();
         }
 
         public void MouseUp(Model m, int x, int y)
@@ -88,7 +88,7 @@ namespace DrawingState
             foreach (Shape selectedShape in _selectedShapes)
             {
                 m.UpdatedShapeIndex = m.Shapes.IndexOf(selectedShape);
-                MovedShapesEvent();
+                _movedShapesEvent();
             }
         }
 

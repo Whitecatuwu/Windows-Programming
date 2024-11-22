@@ -24,22 +24,22 @@ namespace DrawingForm
             _canvas.MouseMove += HandleCanvasPointerMoved;
             _canvas.Paint += HandleCanvasPaint;
 
-            _model.AddedShapeEvent += AddGridViewRow;
-            _model.AddedShapeEvent += UpdateView;
-            _model.RemovedShapeEvent += UpdateView;
-            _model.RemovedShapeEvent += RemoveGridViewRow;
-            _model.SelectingCompletedEvent += UpdateView;
-            _model.SelectingCompletedEvent += delegate { Cursor = Cursors.Default; };
-            _model.SelectingEvent += UpdateView;
-            _model.SelectingEvent += delegate { Cursor = Cursors.Cross; };
-            _model.SelectedShapeEvent += UpdateView;
-            _model.MovedShapesEvent += UpdateGridView;
-            _model.MovingShapesEvent += UpdateView;
+            _model._addedShapeEvent += AddGridViewRow;
+            _model._addedShapeEvent += UpdateView;
+            _model._removedShapeEvent += UpdateView;
+            _model._removedShapeEvent += RemoveGridViewRow;
+            _model._selectingCompletedEvent += UpdateView;
+            _model._selectingCompletedEvent += delegate { Cursor = Cursors.Default; };
+            _model._selectingEvent += UpdateView;
+            _model._selectingEvent += delegate { Cursor = Cursors.Cross; };
+            _model._selectedShapeEvent += UpdateView;
+            _model._movedShapesEvent += UpdateGridView;
+            _model._movingShapesEvent += UpdateView;
 
             _pModel = new PresentationModel.PresentationModel(_model);
-            _pModel.ChangedModeEvent += RefreshToolStrip;
-            _pModel.GotErrorInputEvent += delegate { MessageBox.Show("資料輸入有誤!"); };
-            _pModel.GotNullShapeTypeEvent += delegate { MessageBox.Show("請選擇形狀!"); };
+            _pModel._changedModeEvent += RefreshToolStrip;
+            _pModel._gotErrorInputEvent += delegate { MessageBox.Show("資料輸入有誤!"); };
+            _pModel._gotNullShapeTypeEvent += delegate { MessageBox.Show("請選擇形狀!"); };
 
             ShapeAddButton.DataBindings.Add("Enabled", _pModel, "IsAddButtonEnabled");
 
