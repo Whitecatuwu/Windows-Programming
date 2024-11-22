@@ -158,25 +158,25 @@ namespace DrawingForm
 
         private void TextBoxX_TextChanged(object sender, EventArgs e)
         {
-            _pModel.CheckInput(1, ((TextBox)sender).Text);
+            _pModel.InputData(1, ((TextBox)sender).Text);
             labelX.ForeColor = Color.FromArgb(_pModel.GetXStateColor);
         }
 
         private void TextBoxY_TextChanged(object sender, EventArgs e)
         {
-            _pModel.CheckInput(2, ((TextBox)sender).Text);
+            _pModel.InputData(2, ((TextBox)sender).Text);
             labelY.ForeColor = Color.FromArgb(_pModel.GetYStateColor);
         }
 
         private void TextBoxH_TextChanged(object sender, EventArgs e)
         {
-            _pModel.CheckInput(3, ((TextBox)sender).Text);
+            _pModel.InputData(3, ((TextBox)sender).Text);
             labelH.ForeColor = Color.FromArgb(_pModel.GetHStateColor);
         }
 
         private void TextBoxW_TextChanged(object sender, EventArgs e)
         {
-            _pModel.CheckInput(4, ((TextBox)sender).Text);
+            _pModel.InputData(4, ((TextBox)sender).Text);
             labelW.ForeColor = Color.FromArgb(_pModel.GetWStateColor);
         }
     }

@@ -17,50 +17,29 @@ namespace DrawingForm.PresentationModel
     }
     class PresentationModel : INotifyPropertyChanged
     {
-        Model _model;
-
         public event PropertyChangedEventHandler PropertyChanged;
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler ChangedModeEvent = delegate { };
         public event ModelChangedEventHandler GotNullShapeTypeEvent = delegate { };
         public event ModelChangedEventHandler GotErrorInputEvent = delegate { };
 
+        Model _model;
+        Praser _praser = new Praser();
+
         const int RED = 0x78FF0000;
         const int BLACK = 0x78000000;
         
-        string[] _inputDatas = new string[5]; // Text, X, Y, H, W
+        string[] _inputedDatas = new string[5]; // Text, X, Y, H, W
         bool[] _inputCorrectlyBools = new bool[5] { true, false, false, false, false };// Text, X, Y, H, W
         bool[] _drawingModeSwitch = new bool[5] { false, false, false, false, true };
-
-        Dictionary<string, ShapeType> _stringToShapeType = new Dictionary<string, ShapeType>() { };
-        Dictionary<ShapeType, string> _shapeTypeToString = new Dictionary<ShapeType, string>() { };
-
         DrawingMode _currentDrawingMode = DrawingMode.POINTER;
 
         public PresentationModel(Model model)
         {
             this._model = model;
             _model.SelectingCompletedEvent += delegate { SetDrawingMode(DrawingMode.POINTER); };
-
-            /*來自view輸入的資料型態為string，而model創建形狀所需的參數不全為string，
-             資料型態轉換及判斷輸入的部分在PresentationModel實現。*/
-            _stringToShapeType.Add("Start", ShapeType.START);
-            _stringToShapeType.Add("Terminator", ShapeType.TERMINATOR);
-            _stringToShapeType.Add("Process", ShapeType.PROCESS);
-            _stringToShapeType.Add("Decision", ShapeType.DECISION);
-
-            _shapeTypeToString.Add(ShapeType.START, "Start");
-            _shapeTypeToString.Add(ShapeType.TERMINATOR, "Terminator");
-            _shapeTypeToString.Add(ShapeType.PROCESS, "Process");
-            _shapeTypeToString.Add(ShapeType.DECISION, "Decision");
         }
         //------------Switch------------
-        public string[] InputDatas
-        {
-            set { _inputDatas = value; }
-            get { return _inputDatas; }
-        }
-
         public bool IsStartEnable
         {
             get { return _drawingModeSwitch[0]; }
@@ -107,6 +86,11 @@ namespace DrawingForm.PresentationModel
             get { return _inputCorrectlyBools[4] ? BLACK : RED; }
         }
         //------------------------
+        public string[] InputDatas
+        {
+            set { _inputedDatas = value; }
+            get { return _inputedDatas; }
+        }
 
         public bool IsAddButtonEnabled
         {
@@ -118,7 +102,7 @@ namespace DrawingForm.PresentationModel
             Shape shape = _model.Shapes.ElementAt(index);
             string[] shapeData = new string[]{
                 shape.Id,
-                _shapeTypeToString[shape.ShapeType],
+                _praser.ToString(shape.ShapeType),
                 shape.Text,
                 shape.X.ToString(),
                 shape.Y.ToString(),
@@ -146,10 +130,10 @@ namespace DrawingForm.PresentationModel
             ChangedModeEvent();
         }
 
-        public void CheckInput(in int index, in string data)
+        public void InputData(in int index, in string data)
         {
             if (index < 1 || index > 4) return;
-            _inputDatas[index] = data;
+            _inputedDatas[index] = data;
             _inputCorrectlyBools[index] = int.TryParse(data, out int result) && result > 0;
             Notify("IsAddButtonEnabled");    
         }
@@ -162,7 +146,7 @@ namespace DrawingForm.PresentationModel
                 GotNullShapeTypeEvent();
                 return;
             } 
-            _model.AddShape(_stringToShapeType[shapeType.ToString()], _inputDatas);
+            _model.AddShape(_praser.ToShapeType(shapeType.ToString()), _inputedDatas);
         }
         private void Notify(string propertyName)
         {

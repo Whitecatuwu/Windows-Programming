@@ -10,11 +10,13 @@ namespace DrawingState
         public event ModelChangedEventHandler SelectingEvent = delegate { };
         public event ModelChangedEventHandler SelectingCompletedEvent = delegate { };
 
+        const int SHIFT_KEY = 160;
         int _firstX;
         int _firstY;
         int _lastX;
         int _lastY;
         bool _isPressed = false;
+        bool _isShiftKeyDown = false;
 
         Shape _hint = null;
         PointerState _pointerState;
@@ -37,6 +39,7 @@ namespace DrawingState
             _isPressed = false;
             _hint = null;
             _hintShapeType = ShapeType.NULL;
+            _isShiftKeyDown = false;
         }
 
         public void MouseDown(Model m, int x, int y)
@@ -49,17 +52,7 @@ namespace DrawingState
         public void MouseMove(Model m, int x, int y)
         {
             if (!_isPressed) return;
-
-            if (_hint == null && _hintShapeType != ShapeType.NULL)
-            {
-                string[] shapeData = new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" };
-                _hint = _shapeFactory.CreateShape(_hintShapeType, shapeData);
-            }
-            _lastX = x;
-            _lastY = y;
-            _hint.Width = _lastX - _firstX;
-            _hint.Height = _lastY - _firstY;  
-            SelectingEvent();
+            DrawHint(x, y);
         }
 
         public void MouseUp(Model m, int x, int y)
@@ -71,7 +64,7 @@ namespace DrawingState
             {
                 SelectingCompletedEvent();
                 return;
-            }           
+            }
             _hint.Normalize();
             m.AddShape(_hint);
             SelectingCompletedEvent();
@@ -91,12 +84,48 @@ namespace DrawingState
 
         public void KeyDown(Model m, int keyValue)
         {
-            // do nothing
+            if (_isShiftKeyDown) return;
+            if (keyValue == SHIFT_KEY)
+            {
+                DrawHint(_lastX, _lastY);
+                _isShiftKeyDown = true;
+            }
         }
 
         public void KeyUp(Model m, int keyValue)
         {
-            // do nothing
+            if (keyValue == SHIFT_KEY)
+            {
+                DrawHint(_lastX, _lastY);
+                _isShiftKeyDown = false;
+            }
+        }
+
+        private void DrawHint(int x, int y)
+        {
+            if (_hint == null && _hintShapeType != ShapeType.NULL)
+            {
+                string[] shapeData = new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" };
+                _hint = _shapeFactory.CreateShape(_hintShapeType, shapeData);
+            }
+            _lastX = x;
+            _lastY = y;
+
+            int dx = _lastX - _firstX;
+            int dy = _lastY - _firstY;
+
+            if (_isShiftKeyDown)
+            {
+                int width = Math.Min(Math.Abs(dx), Math.Abs(dy));
+                _hint.Width = (dx < 0) ? -width : width;
+                _hint.Height = (dy < 0) ? -width : width;
+            }
+            else
+            {
+                _hint.Width = dx;
+                _hint.Height = dy;
+            }
+            SelectingEvent();
         }
     }
 }

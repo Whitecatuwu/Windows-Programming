@@ -91,6 +91,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="PresentationModel\Praser.cs" />
     <Compile Include="PresentationModel\PresentationModel.cs" />
     <Compile Include="PresentationModel\WindowsFormsGraphicsAdaptor.cs" />
     <Compile Include="Program.cs" />

@@ -90,7 +90,9 @@ namespace DrawingForm.PresentationModel
             ref int height = ref result[2];
             ref int width = ref result[3];
 
-            _graphics.DrawString(text, new Font("Arial", 7), Brushes.Black, x + width / 2, y + height / 2);
+            StringFormat format = new StringFormat();
+            format.Alignment = StringAlignment.Center;
+            _graphics.DrawString(text, new Font("Arial", 7), Brushes.Black, x + width / 2, y + height / 2, format);
         }
 
         private void Normalize(in int[] datas, out int[] result)
