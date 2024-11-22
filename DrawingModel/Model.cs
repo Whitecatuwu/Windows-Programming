@@ -1,17 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
 using DrawingShape;
 using DrawingState;
-using System.ComponentModel;
+
 
 namespace DrawingModel
 {
-    public class Model : INotifyPropertyChanged
+    public class Model //: INotifyPropertyChanged
     {
+        //public event PropertyChangedEventHandler PropertyChanged;
+
+        public delegate void ModelChangedEventHandler();
+        public event ModelChangedEventHandler AddedShapeEvent = delegate { };
+        public event ModelChangedEventHandler RemovedShapeEvent = delegate { };
+        public event ModelChangedEventHandler MovingShapesEvent = delegate { };
+        public event ModelChangedEventHandler MovedShapesEvent = delegate { };
+        public event ModelChangedEventHandler SelectedShapeEvent = delegate { };
+        public event ModelChangedEventHandler SelectingCompletedEvent = delegate { };
+        public event ModelChangedEventHandler SelectingEvent = delegate { };
+
         ShapeFactory _shapeFactory = new ShapeFactory();
         List<Shape> _shapes = new List<Shape>();
 
@@ -22,21 +29,10 @@ namespace DrawingModel
         int _removedShapeIndex;
         int _updatedShapeIndex;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public delegate void ModelChangedEventHandler();
-        public event ModelChangedEventHandler AddedShapeEvent = delegate { };
-        public event ModelChangedEventHandler RemovedShapeEvent = delegate { };
-        public event ModelChangedEventHandler MovingShapesEvent = delegate { };
-        public event ModelChangedEventHandler MovedShapesEvent = delegate { };
-        public event ModelChangedEventHandler SelectedShapeEvent = delegate { };
-        public event ModelChangedEventHandler SelectingCompletedEvent = delegate { };
-        public event ModelChangedEventHandler SelectingEvent = delegate { };
-
-
         public Model()
         {
             _pointerState = new PointerState();
-            _drawingState = new DrawingState.DrawingState((PointerState)_pointerState);
+            _drawingState = new DrawingState.DrawingState(_pointerState);
 
             _pointerState.SelectedShapeEvent += delegate { SelectedShapeEvent(); };
             _pointerState.MovingShapesEvent += delegate { MovingShapesEvent(); };
@@ -109,7 +105,7 @@ namespace DrawingModel
             AddedShapeEvent();
         }
 
-        public void AddShape(Shape shape)
+        public void AddShape(in Shape shape)
         {
             _shapes.Add(shape);
             AddedShapeEvent();
@@ -117,6 +113,7 @@ namespace DrawingModel
 
         public void RemoveShape(in int index)
         {
+            _pointerState.RemoveSelectedShape(_shapes[index]);
             _shapes.RemoveAt(index);
             _removedShapeIndex = index;
             RemovedShapeEvent();

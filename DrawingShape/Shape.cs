@@ -1,6 +1,5 @@
 ﻿using DrawingModel;
 using System;
-using System.Drawing;
 
 namespace DrawingShape
 {
@@ -12,7 +11,7 @@ namespace DrawingShape
         PROCESS = 2,
         DECISION = 3
     }
-    abstract public class Shape
+    abstract public class Shape : IComparable<Shape>
     {
         public Shape(ShapeType shapeType, string[] shapeDatas)
         {
@@ -96,6 +95,13 @@ namespace DrawingShape
                 _y += _height;
                 _height = -_height;
             }
+        }
+
+        public int CompareTo(Shape other)
+        {
+            if (System.Object.ReferenceEquals(this, other)) return 0;
+            if (other == null) return 1;
+            return -1;
         }
     }
 }

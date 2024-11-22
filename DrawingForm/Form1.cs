@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-
 using DrawingModel;
 using DrawingForm.PresentationModel;
-using DrawingShape;
-using DrawingState;
 
 namespace DrawingForm
 {
@@ -168,34 +158,26 @@ namespace DrawingForm
 
         private void TextBoxX_TextChanged(object sender, EventArgs e)
         {
-            if (_pModel.CheckInput(1, ((TextBox)sender).Text))
-                labelX.ForeColor = Color.Black;
-            else
-                labelX.ForeColor = Color.Red;
+            _pModel.CheckInput(1, ((TextBox)sender).Text);
+            labelX.ForeColor = Color.FromArgb(_pModel.GetXStateColor);
         }
 
         private void TextBoxY_TextChanged(object sender, EventArgs e)
         {
-            if (_pModel.CheckInput(2, ((TextBox)sender).Text))
-                labelY.ForeColor = Color.Black;
-            else
-                labelY.ForeColor = Color.Red;
+            _pModel.CheckInput(2, ((TextBox)sender).Text);
+            labelY.ForeColor = Color.FromArgb(_pModel.GetYStateColor);
         }
 
         private void TextBoxH_TextChanged(object sender, EventArgs e)
         {
-            if (_pModel.CheckInput(3, ((TextBox)sender).Text))
-                labelH.ForeColor = Color.Black;
-            else
-                labelH.ForeColor = Color.Red;
+            _pModel.CheckInput(3, ((TextBox)sender).Text);
+            labelH.ForeColor = Color.FromArgb(_pModel.GetHStateColor);
         }
 
         private void TextBoxW_TextChanged(object sender, EventArgs e)
         {
-            if (_pModel.CheckInput(4, ((TextBox)sender).Text))
-                labelW.ForeColor = Color.Black;
-            else
-                labelW.ForeColor = Color.Red;
+            _pModel.CheckInput(4, ((TextBox)sender).Text);
+            labelW.ForeColor = Color.FromArgb(_pModel.GetWStateColor);
         }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using DrawingModel;
 using DrawingShape;
 
@@ -8,17 +6,17 @@ namespace DrawingState
 {
     public class PointerState : IState
     {
+        public delegate void ModelChangedEventHandler();
+        public event ModelChangedEventHandler MovingShapesEvent = delegate { };
+        public event ModelChangedEventHandler MovedShapesEvent = delegate { };
+        public event ModelChangedEventHandler SelectedShapeEvent = delegate { };
+
         SortedSet<Shape> _selectedShapes = new SortedSet<Shape>();
         const int CTRL_KEY = 17;
         bool _isCtrlKeyDown = false;
         bool _isPressed = false;
         int _preX = 0;
         int _preY = 0;
-
-        public delegate void ModelChangedEventHandler();
-        public event ModelChangedEventHandler MovingShapesEvent = delegate { };
-        public event ModelChangedEventHandler MovedShapesEvent = delegate { };
-        public event ModelChangedEventHandler SelectedShapeEvent = delegate { };
 
         public void Initialize(Model m)
         {
@@ -54,6 +52,12 @@ namespace DrawingState
             SelectedShapeEvent();
         }
 
+        public void RemoveSelectedShape(Shape shape)
+        {
+            if (_selectedShapes.Remove(shape))
+                SelectedShapeEvent();
+        }
+
         public void ClearSelectedShapes()
         {
             _selectedShapes.Clear();
@@ -80,6 +84,7 @@ namespace DrawingState
         {
             if (!_isPressed) return;
             _isPressed = false;
+
             foreach (Shape selectedShape in _selectedShapes)
             {
                 m.UpdatedShapeIndex = m.Shapes.IndexOf(selectedShape);
@@ -103,7 +108,7 @@ namespace DrawingState
 
         public void KeyDown(Model m, int keyValue)
         {
-            if(_isCtrlKeyDown) return;
+            if (_isCtrlKeyDown) return;
             if (keyValue == CTRL_KEY)
                 _isCtrlKeyDown = true;
         }

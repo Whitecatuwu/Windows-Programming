@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DrawingModel;
 using DrawingShape;
-using System.Reflection;
 using System.ComponentModel;
 
 namespace DrawingForm.PresentationModel
@@ -23,18 +19,21 @@ namespace DrawingForm.PresentationModel
     {
         Model _model;
 
-        private string[] _inputDatas = new string[5]; // Text, X, Y, H, W
-        bool[] _inputCorrectlyBools = new bool[5] { true, false, false, false, false };// Text, X, Y, H, W
-        bool[] _drawingModeSwitch = new bool[5] { false, false, false, false, true };
-
-        private Dictionary<string, ShapeType> _stringToShapeType = new Dictionary<string, ShapeType>() { };
-        private Dictionary<ShapeType, string> _shapeTypeToString = new Dictionary<ShapeType, string>() { };
-
         public event PropertyChangedEventHandler PropertyChanged;
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler ChangedModeEvent = delegate { };
         public event ModelChangedEventHandler GotNullShapeTypeEvent = delegate { };
         public event ModelChangedEventHandler GotErrorInputEvent = delegate { };
+
+        const int RED = 0x78FF0000;
+        const int BLACK = 0x78000000;
+        
+        string[] _inputDatas = new string[5]; // Text, X, Y, H, W
+        bool[] _inputCorrectlyBools = new bool[5] { true, false, false, false, false };// Text, X, Y, H, W
+        bool[] _drawingModeSwitch = new bool[5] { false, false, false, false, true };
+
+        Dictionary<string, ShapeType> _stringToShapeType = new Dictionary<string, ShapeType>() { };
+        Dictionary<ShapeType, string> _shapeTypeToString = new Dictionary<ShapeType, string>() { };
 
         DrawingMode _currentDrawingMode = DrawingMode.POINTER;
 
@@ -86,6 +85,27 @@ namespace DrawingForm.PresentationModel
         {
             get { return _drawingModeSwitch[4]; }
         }
+        //------------Inputs State------------
+
+        public int GetXStateColor
+        {
+            get { return _inputCorrectlyBools[1] ? BLACK : RED; }
+        }
+
+        public int GetYStateColor
+        {
+            get { return _inputCorrectlyBools[2] ? BLACK : RED; }
+        }
+
+        public int GetHStateColor
+        {
+            get { return _inputCorrectlyBools[3] ? BLACK : RED; }
+        }
+
+        public int GetWStateColor
+        {
+            get { return _inputCorrectlyBools[4] ? BLACK : RED; }
+        }
         //------------------------
 
         public bool IsAddButtonEnabled
@@ -126,20 +146,12 @@ namespace DrawingForm.PresentationModel
             ChangedModeEvent();
         }
 
-        public bool CheckInput(in int index, in string data)
+        public void CheckInput(in int index, in string data)
         {
-            if (index < 1 || index > 4) return false;
+            if (index < 1 || index > 4) return;
             _inputDatas[index] = data;
-            try
-            {
-                _inputCorrectlyBools[index] = (int.Parse(_inputDatas[index]) > 0);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            _inputCorrectlyBools[index] = int.TryParse(data, out int result) && result > 0;
             Notify("IsAddButtonEnabled");    
-            return _inputCorrectlyBools[index];
         }
 
         public void AddShape(in object shapeType)
@@ -149,8 +161,7 @@ namespace DrawingForm.PresentationModel
             {
                 GotNullShapeTypeEvent();
                 return;
-            }
-         
+            } 
             _model.AddShape(_stringToShapeType[shapeType.ToString()], _inputDatas);
         }
         private void Notify(string propertyName)
