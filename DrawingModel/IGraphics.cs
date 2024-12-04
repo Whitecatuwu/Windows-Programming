@@ -11,5 +11,6 @@ namespace DrawingModel
         void DrawDecision(in int[] datas);
         void DrawFrame(in int[] datas);
         void DrawText(in int[] datas, in string text);
+        void DrawPoint(in int x, in int y,in int r);
     }
 }

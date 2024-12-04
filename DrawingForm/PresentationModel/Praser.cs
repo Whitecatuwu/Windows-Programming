@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace DrawingForm.PresentationModel
 {
-    class Praser
+    public class Praser
     {
         Dictionary<string, ShapeType> _stringToShapeType = new Dictionary<string, ShapeType>() { };
         Dictionary<ShapeType, string> _shapeTypeToString = new Dictionary<ShapeType, string>() { };
@@ -25,7 +25,6 @@ namespace DrawingForm.PresentationModel
         {
             return _shapeTypeToString[shapeType];
         }
-
 
         public ShapeType ToShapeType(in string str)
         {

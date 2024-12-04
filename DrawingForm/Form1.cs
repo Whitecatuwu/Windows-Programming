@@ -9,9 +9,12 @@ namespace DrawingForm
 {
     public partial class Form1 : Form
     {
+        Pen _pen = new Pen(Color.DarkBlue, 1);
+        Pen _framePen = new Pen(Color.Red, 2);
         Panel _canvas = new DoubleBufferedPanel();
         Model _model = new Model();
         PresentationModel.PresentationModel _pModel;
+
         public Form1()
         {
             InitializeComponent();
@@ -36,7 +39,7 @@ namespace DrawingForm
             _model._movedShapesEvent += UpdateGridView;
             _model._movingShapesEvent += UpdateView;
 
-            _pModel = new PresentationModel.PresentationModel(_model);
+            this._pModel = new PresentationModel.PresentationModel(_model);
             _pModel._changedModeEvent += RefreshToolStrip;
             _pModel._gotErrorInputEvent += delegate { MessageBox.Show("資料輸入有誤!"); };
             _pModel._gotNullShapeTypeEvent += delegate { MessageBox.Show("請選擇形狀!"); };
@@ -109,12 +112,13 @@ namespace DrawingForm
 
         private void HandleCanvasPaint(object sender, PaintEventArgs e)
         {
-            _model.OnPaint(new WindowsFormsGraphicsAdaptor(e.Graphics));
+            _model.OnPaint(new WindowsFormsGraphicsAdaptor(e.Graphics, _pen, _framePen));
         }
 
         private void UpdateView()
         {
-            Invalidate(true);
+            //Invalidate(true);
+            _canvas.Invalidate(true);
         }
 
         private void RefreshToolStrip()

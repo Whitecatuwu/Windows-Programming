@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DrawingModel;
 using DrawingShape;
 
@@ -18,6 +19,8 @@ namespace DrawingState
         int _preX = 0;
         int _preY = 0;
 
+        Shape _touchedTextBoxShape = null;
+
         public void Initialize(Model m)
         {
             _selectedShapes.Clear();
@@ -32,8 +35,14 @@ namespace DrawingState
             _isPressed = true;
             _preX = x;
             _preY = y;
-            foreach (Shape shape in m.Shapes)
+
+            foreach (Shape shape in m.Shapes.Reverse())
             {
+                if (_touchedTextBoxShape == null && shape.IsTouchMovePoint(x, y))
+                {
+                    _touchedTextBoxShape = shape;
+                }
+
                 if (((IDrawable)shape).IsPointInRange(x, y))
                 {
                     if (!_isCtrlKeyDown)
@@ -67,12 +76,22 @@ namespace DrawingState
         public void MouseMove(Model m, int x, int y)
         {
             if (!_isPressed) return;
+            if (_preX == x && _preY == y) return;
 
-            foreach (Shape selectedShape in _selectedShapes)
+            if (_touchedTextBoxShape != null)
             {
-                selectedShape.X += x - _preX;
-                selectedShape.Y += y - _preY;
-                selectedShape.Normalize();
+                _touchedTextBoxShape.TextBox_X += x - _preX;
+                _touchedTextBoxShape.TextBox_Y += y - _preY;
+            }
+
+            else
+            {
+                foreach (Shape selectedShape in _selectedShapes)
+                {
+                    selectedShape.X += x - _preX;
+                    selectedShape.Y += y - _preY;
+                    selectedShape.Normalize();
+                }
             }
 
             _preX = x;
@@ -84,6 +103,8 @@ namespace DrawingState
         {
             if (!_isPressed) return;
             _isPressed = false;
+
+            _touchedTextBoxShape = null;
 
             foreach (Shape selectedShape in _selectedShapes)
             {
@@ -99,6 +120,8 @@ namespace DrawingState
             {
                 ((IDrawable)shape).Draw(g);
                 shape.DrawText(g);
+                shape.DrawTextBoxFrame(g);
+                shape.DrawTextBoxMovePoint(g);
             }
             foreach (Shape selectedShape in _selectedShapes)
             {

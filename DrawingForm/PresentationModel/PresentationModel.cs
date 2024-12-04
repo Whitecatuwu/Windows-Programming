@@ -15,9 +15,9 @@ namespace DrawingForm.PresentationModel
         DECISION = 3,
         POINTER = 4
     }
-    class PresentationModel : INotifyPropertyChanged
+    public class PresentationModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler _changedModeEvent = delegate { };
         public event ModelChangedEventHandler _gotNullShapeTypeEvent = delegate { };
@@ -114,6 +114,8 @@ namespace DrawingForm.PresentationModel
 
         public void SetDrawingMode(in DrawingMode drawingMode)
         {
+            if (drawingMode == DrawingMode.NULL) return;
+
             _drawingModeSwitch[(int)_currentDrawingMode] = false;
             _drawingModeSwitch[(int)drawingMode] = true;
             _currentDrawingMode = drawingMode;
@@ -122,7 +124,7 @@ namespace DrawingForm.PresentationModel
             {
                 _model.EnterPointerState();
             }
-            else if (drawingMode != DrawingMode.NULL)
+            else
             {
                 _model.EnterDrawingState((ShapeType)drawingMode);
             }
@@ -150,8 +152,7 @@ namespace DrawingForm.PresentationModel
         }
         private void Notify(string propertyName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace DrawingShape
 {
-    internal class Process : Shape, IDrawable
+    public class Process : Shape, IDrawable
     {
         public Process(ShapeType shapeType, string[] shapeDatas) : base(shapeType, shapeDatas) { }
         public void Draw(DrawingModel.IGraphics graphics)

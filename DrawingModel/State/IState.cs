@@ -2,7 +2,7 @@
 
 namespace DrawingState
 {
-    internal interface IState
+    public interface IState
     {
         void Initialize(Model m);
         void OnPaint(Model m, IGraphics g);

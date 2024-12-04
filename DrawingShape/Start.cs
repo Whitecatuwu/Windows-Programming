@@ -3,7 +3,7 @@
 
 namespace DrawingShape
 {
-    internal class Start : Shape, IDrawable
+    public class Start : Shape, IDrawable
     {
         public Start(ShapeType shapeType, string[] shapeDatas) : base(shapeType, shapeDatas) { }
         public void Draw(DrawingModel.IGraphics graphics)

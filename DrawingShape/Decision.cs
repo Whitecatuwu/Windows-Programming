@@ -2,7 +2,7 @@
 
 namespace DrawingShape
 {
-    internal class Decision : Shape, IDrawable
+    public class Decision : Shape, IDrawable
     {
         public Decision(ShapeType shapeType, string[] shapeDatas) : base(shapeType, shapeDatas) { }
         public void Draw(DrawingModel.IGraphics graphics)

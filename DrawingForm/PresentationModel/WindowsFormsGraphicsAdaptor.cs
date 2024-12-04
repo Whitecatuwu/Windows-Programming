@@ -13,11 +13,14 @@ namespace DrawingForm.PresentationModel
     class WindowsFormsGraphicsAdaptor : IGraphics
     {
         Graphics _graphics;
-        Pen _pen = new Pen(Color.DarkBlue, 1);
-        Pen _framePen = new Pen(Color.Red, 2);
-        public WindowsFormsGraphicsAdaptor(Graphics graphics)
+        Pen _pen;
+        Pen _framePen;
+
+        public WindowsFormsGraphicsAdaptor(Graphics graphics, Pen pen, Pen framePen)
         {
             this._graphics = graphics;
+            this._pen = pen;
+            this._framePen = framePen;
         }
         public void ClearAll()
         {
@@ -92,7 +95,11 @@ namespace DrawingForm.PresentationModel
 
             StringFormat format = new StringFormat();
             format.Alignment = StringAlignment.Center;
-            _graphics.DrawString(text, new Font("Arial", 7), Brushes.Black, x + width / 2, y + height / 2, format);
+            _graphics.DrawString(text, new Font("Arial", 7), Brushes.Black, x , y, format);
+        }
+        public void DrawPoint(in int x, in int y, in int r)
+        {
+            _graphics.FillEllipse(Brushes.Orange, x, y, r, r);
         }
 
         private void Normalize(in int[] datas, out int[] result)

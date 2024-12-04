@@ -4,7 +4,7 @@ using System;
 
 namespace DrawingState
 {
-    internal class DrawingState : IState
+    public class DrawingState : IState
     {
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler _selectingEvent = delegate { };
@@ -52,7 +52,8 @@ namespace DrawingState
         public void MouseMove(Model m, int x, int y)
         {
             if (!_isPressed) return;
-            DrawHint(x, y);
+            if (_lastX == x && _lastY == y) return;
+            SelectHintRange(x, y);
         }
 
         public void MouseUp(Model m, int x, int y)
@@ -78,8 +79,13 @@ namespace DrawingState
             {
                 ((IDrawable)shape).Draw(g);
                 shape.DrawText(g);
+                shape.DrawTextBoxFrame(g);
+                shape.DrawTextBoxMovePoint(g);
             }
-            ((IDrawable)_hint).Draw(g);
+            if (_hint != null)
+            {
+                ((IDrawable)_hint).Draw(g);
+            }
         }
 
         public void KeyDown(Model m, int keyValue)
@@ -87,7 +93,7 @@ namespace DrawingState
             if (_isShiftKeyDown) return;
             if (keyValue == SHIFT_KEY)
             {
-                DrawHint(_lastX, _lastY);
+                SelectHintRange(_lastX, _lastY);
                 _isShiftKeyDown = true;
             }
         }
@@ -96,18 +102,19 @@ namespace DrawingState
         {
             if (keyValue == SHIFT_KEY)
             {
-                DrawHint(_lastX, _lastY);
+                SelectHintRange(_lastX, _lastY);
                 _isShiftKeyDown = false;
             }
         }
 
-        private void DrawHint(int x, int y)
+        private void SelectHintRange(int x, int y)
         {
             if (_hint == null)
             {
                 if (_hintShapeType == ShapeType.NULL) return;
                 string[] shapeData = new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" };
                 _hint = _shapeFactory.CreateShape(_hintShapeType, shapeData);
+                return;
             }
             _lastX = x;
             _lastY = y;

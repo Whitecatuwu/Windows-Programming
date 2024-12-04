@@ -3,7 +3,7 @@ using DrawingShape;
 
 namespace DrawingModel
 {
-    internal class ShapeFactory
+    public class ShapeFactory
     {
         public Shape CreateShape(ShapeType shapeType, string[] shapeDatas)
         {

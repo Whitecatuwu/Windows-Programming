@@ -26,8 +26,8 @@ namespace DrawingModel
         DrawingState.DrawingState _drawingState;
         IState _currentState;
 
-        int _removedShapeIndex;
-        int _updatedShapeIndex;
+        int _removedShapeIndex = -1;
+        int _updatedShapeIndex = -1;
 
         public Model()
         {

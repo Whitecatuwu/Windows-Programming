@@ -2,7 +2,7 @@
 
 namespace DrawingShape
 {
-    internal interface IDrawable
+    public interface IDrawable
     {
         void Draw(DrawingModel.IGraphics graphics);
 
