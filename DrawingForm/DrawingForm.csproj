@@ -61,6 +61,9 @@
     <Compile Include="..\DrawingModel\State\IState.cs">
       <Link>State\IState.cs</Link>
     </Compile>
+    <Compile Include="..\DrawingModel\State\LineState.cs">
+      <Link>State\LineState.cs</Link>
+    </Compile>
     <Compile Include="..\DrawingModel\State\PointerState.cs">
       <Link>State\PointerState.cs</Link>
     </Compile>

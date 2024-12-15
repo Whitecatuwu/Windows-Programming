@@ -65,8 +65,7 @@ namespace DrawingShape
         {
             set
             {
-                _textBox_X += value - _x;
-                _textBoxMovePoint_X += value - _x;
+                TextBox_X += value - _x;
                 _x = value;
             }
             get { return _x; }
@@ -75,8 +74,7 @@ namespace DrawingShape
         {
             set
             {
-                _textBox_Y += value - _y;
-                _textBoxMovePoint_Y += value - _y;
+                TextBox_Y += value - _y;
                 _y = value;
             }
             get { return _y; }
@@ -87,7 +85,7 @@ namespace DrawingShape
             {
                 _height = value;
                 TextBox_Y = _y + _height / 2;
-                _textBoxMovePoint_Y = _textBox_Y - _textBox_H / 2;
+                //_textBoxMovePoint_Y = _textBox_Y - _textBox_H / 2;
             }
             get { return _height; }
         }
@@ -97,7 +95,7 @@ namespace DrawingShape
             {
                 _width = value;
                 TextBox_X = _x + _width / 2;
-                _textBoxMovePoint_X = _textBox_X;
+                //_textBoxMovePoint_X = _textBox_X;
             }
             get { return _width; }
         }
@@ -168,7 +166,6 @@ namespace DrawingShape
 
         public bool IsTouchMovePoint(int x, int y)
         {
-
             ref int cx = ref _textBoxMovePoint_X;
             ref int cy = ref _textBoxMovePoint_Y;
             return (x - cx) * (x - cx) + (y - cy) * (y - cy) <= POINT_RADIUS * POINT_RADIUS;

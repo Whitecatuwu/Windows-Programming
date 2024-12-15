@@ -31,8 +31,8 @@ namespace DrawingForm.PresentationModel
             Normalize(datas, out int[] result);
             ref int x = ref result[0];
             ref int y = ref result[1];
-            ref int height = ref result[2];
-            ref int width = ref result[3];
+            int height = Math.Max(result[2], 1);
+            int width = Math.Max(result[3], 1);
 
             _graphics.DrawArc(_pen, x, y, height, height, 90, 180);
             _graphics.DrawArc(_pen, x + width - height, y, height, height, 270, 180);
@@ -95,7 +95,7 @@ namespace DrawingForm.PresentationModel
 
             StringFormat format = new StringFormat();
             format.Alignment = StringAlignment.Center;
-            _graphics.DrawString(text, new Font("Arial", 7), Brushes.Black, x , y, format);
+            _graphics.DrawString(text, new Font("Arial", 7), Brushes.Black, x, y, format);
         }
         public void DrawPoint(in int x, in int y, in int r)
         {

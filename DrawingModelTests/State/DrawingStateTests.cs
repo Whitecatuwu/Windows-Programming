@@ -96,6 +96,13 @@ namespace DrawingState.Tests
         }
 
         [TestMethod()]
+        public void MouseDoubleClickTest()
+        {
+            DrawingState drawingState = new DrawingState(pointerState);
+            drawingState.MouseDoubleClick(m,114,514);
+        }
+
+        [TestMethod()]
         public void OnPaintTest()
         {
             DrawingState drawingState = new DrawingState(pointerState);
@@ -148,5 +155,7 @@ namespace DrawingState.Tests
             privateObject.Invoke("SelectHintRange", 200, 280);
 
         }
+
+
     }
 }

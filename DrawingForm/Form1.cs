@@ -26,6 +26,7 @@ namespace DrawingForm
             _canvas.MouseUp += HandleCanvasPointerReleased;
             _canvas.MouseMove += HandleCanvasPointerMoved;
             _canvas.Paint += HandleCanvasPaint;
+            _canvas.MouseDoubleClick += HandleCanvasPointerDoubleClick;
 
             _model._addedShapeEvent += AddGridViewRow;
             _model._addedShapeEvent += UpdateView;
@@ -113,6 +114,10 @@ namespace DrawingForm
         private void HandleCanvasPaint(object sender, PaintEventArgs e)
         {
             _model.OnPaint(new WindowsFormsGraphicsAdaptor(e.Graphics, _pen, _framePen));
+        }
+        private void HandleCanvasPointerDoubleClick(object sender, MouseEventArgs e)
+        {
+            _model.MouseDoubleClick(e.X, e.Y);
         }
 
         private void UpdateView()

@@ -62,9 +62,11 @@
             this.toolStripProcessButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripDecisionButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSelectButton = new System.Windows.Forms.ToolStripButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.shapeGridView)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // shapeGridView
@@ -283,7 +285,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(33, 62);
+            this.button1.Location = new System.Drawing.Point(24, 35);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(128, 73);
             this.button1.TabIndex = 14;
@@ -292,7 +294,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(33, 164);
+            this.button2.Location = new System.Drawing.Point(24, 114);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(128, 73);
             this.button2.TabIndex = 15;
@@ -390,14 +392,23 @@
             this.toolStripSelectButton.ToolTipText = "Select";
             this.toolStripSelectButton.Click += new System.EventHandler(this.toolStripSelectButton_Click);
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.Controls.Add(this.button2);
+            this.groupBox1.Location = new System.Drawing.Point(0, 57);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(173, 370);
+            this.groupBox1.TabIndex = 18;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "頁數列表";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1193, 630);
             this.Controls.Add(this.toolStrip1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.ShapeAddButton);
             this.Controls.Add(this.labelW);
             this.Controls.Add(this.labelH);
@@ -413,12 +424,14 @@
             this.Controls.Add(this.shapeGridView);
             this.Controls.Add(this.dataDisplay);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.shapeGridView)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -459,6 +472,7 @@
         private System.Windows.Forms.ToolStripButton toolStripProcessButton;
         private System.Windows.Forms.ToolStripButton toolStripDecisionButton;
         private System.Windows.Forms.ToolStripButton toolStripSelectButton;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }
 

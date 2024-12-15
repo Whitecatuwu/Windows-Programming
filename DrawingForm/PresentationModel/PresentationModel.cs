@@ -13,7 +13,8 @@ namespace DrawingForm.PresentationModel
         TERMINATOR = 1,
         PROCESS = 2,
         DECISION = 3,
-        POINTER = 4
+        POINTER = 4,
+        LINE = 5
     }
     public class PresentationModel : INotifyPropertyChanged
     {
@@ -28,10 +29,10 @@ namespace DrawingForm.PresentationModel
 
         const int RED = 0x78FF0000;
         const int BLACK = 0x78000000;
-        
+
         string[] _inputedDatas = new string[5]; // Text, X, Y, H, W
         bool[] _inputCorrectlyBools = new bool[5] { true, false, false, false, false };// Text, X, Y, H, W
-        bool[] _drawingModeSwitch = new bool[5] { false, false, false, false, true };
+        bool[] _drawingModeSwitch = new bool[6] { false, false, false, false, true, false };
         DrawingMode _currentDrawingMode = DrawingMode.POINTER;
 
         public PresentationModel(Model model)
@@ -124,6 +125,10 @@ namespace DrawingForm.PresentationModel
             {
                 _model.EnterPointerState();
             }
+            else if(drawingMode == DrawingMode.LINE)
+            {
+                _model.EnterLineState();
+            }
             else
             {
                 _model.EnterDrawingState((ShapeType)drawingMode);
@@ -137,7 +142,7 @@ namespace DrawingForm.PresentationModel
             if (index < 1 || index > 4) return;
             _inputedDatas[index] = data;
             _inputCorrectlyBools[index] = int.TryParse(data, out int result) && result > 0;
-            Notify("IsAddButtonEnabled");    
+            Notify("IsAddButtonEnabled");
         }
 
         public void AddShape(in object shapeType)
@@ -147,7 +152,7 @@ namespace DrawingForm.PresentationModel
             {
                 _gotNullShapeTypeEvent();
                 return;
-            } 
+            }
             _model.AddShape(_praser.ToShapeType(shapeType.ToString()), _inputedDatas);
         }
         private void Notify(string propertyName)

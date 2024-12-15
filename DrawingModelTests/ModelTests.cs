@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DrawingModel;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using DrawingShape;
 using DrawingShapeTests;
@@ -29,6 +30,12 @@ namespace DrawingModel.Tests
         }
 
         [TestMethod()]
+        public void EnterLineStateTest()
+        {
+            Assert.Fail();
+        }
+
+        [TestMethod()]
         public void MouseDownTest()
         {
             Model model = new Model();
@@ -47,6 +54,13 @@ namespace DrawingModel.Tests
         {
             Model model = new Model();
             model.MouseUp(114, 514);
+        }
+
+        [TestMethod()]
+        public void MouseDoubleClickTest()
+        {
+            Model model = new Model();
+            model.MouseDoubleClick(114, 514);
         }
 
         [TestMethod()]

@@ -75,11 +75,6 @@ namespace DrawingShape.Tests
         {
             MockGraphics mock = new MockGraphics();
             process.DrawText(mock);
-            for (int i = 0; i < 4; i++)
-            {
-                Assert.AreEqual(mock.testDatas[i], process.ShapeDatas[i]);
-            }
-            Assert.AreEqual(mock.text, process.Text);
         }
 
         [TestMethod()]

@@ -24,6 +24,7 @@ namespace DrawingModel
 
         PointerState _pointerState;
         DrawingState.DrawingState _drawingState;
+        LineState _lineState;
         IState _currentState;
 
         int _removedShapeIndex = -1;
@@ -33,6 +34,7 @@ namespace DrawingModel
         {
             _pointerState = new PointerState();
             _drawingState = new DrawingState.DrawingState(_pointerState);
+            _lineState = new LineState();
 
             _pointerState._selectedShapeEvent += delegate { _selectedShapeEvent(); };
             _pointerState._movingShapesEvent += delegate { _movingShapesEvent(); };
@@ -78,6 +80,12 @@ namespace DrawingModel
             _currentState = _drawingState;
         }
 
+        public void EnterLineState()
+        {
+            _lineState.Initialize(this);
+            _currentState = _lineState;
+        }
+
         public void MouseDown(int x, int y)
         {
             _currentState.MouseDown(this, x, y);
@@ -91,6 +99,10 @@ namespace DrawingModel
         public void MouseUp(int x, int y)
         {
             _currentState.MouseUp(this, x, y);
+        }
+        public void MouseDoubleClick(int x,int y)
+        {
+            _currentState.MouseDoubleClick(this, x, y);
         }
 
         public void OnPaint(IGraphics g)

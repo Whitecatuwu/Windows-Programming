@@ -113,6 +113,18 @@ namespace DrawingState
             }
         }
 
+        public void MouseDoubleClick(Model m, int x, int y)
+        {
+            foreach (Shape shape in m.Shapes.Reverse())
+            {
+                if (shape.IsTouchMovePoint(x, y))
+                {
+                   // _touchedTextBoxShape = shape;
+                    return;
+                }
+            }
+        }
+
         public void OnPaint(Model m, IGraphics g)
         {
             g.ClearAll();

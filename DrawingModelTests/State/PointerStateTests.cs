@@ -91,7 +91,7 @@ namespace DrawingState.Tests
             pointerState.AddSelectedShape(terminator);
             pointerState.AddSelectedShape(decision);
 
-            
+
             Assert.IsFalse(selectedShapes.Contains(process));
             pointerState.RemoveSelectedShape(process);
         }
@@ -167,6 +167,12 @@ namespace DrawingState.Tests
             pointerState.MouseDown(m, 450, 450);
             pointerState.MouseUp(m, 0, 0);
             Assert.AreEqual(m.UpdatedShapeIndex, 2);
+        }
+
+        [TestMethod()]
+        public void MouseDoubleClickTest()
+        {
+            Assert.Fail();
         }
 
         [TestMethod()]

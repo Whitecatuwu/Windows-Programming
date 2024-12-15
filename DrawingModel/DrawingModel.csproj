@@ -67,6 +67,7 @@
     <Compile Include="ShapeFactory.cs" />
     <Compile Include="State\DrawingState.cs" />
     <Compile Include="State\IState.cs" />
+    <Compile Include="State\LineState.cs" />
     <Compile Include="State\PointerState.cs" />
   </ItemGroup>
   <ItemGroup />

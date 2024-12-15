@@ -71,7 +71,10 @@ namespace DrawingState
             _selectingCompletedEvent();
             _pointerState.AddSelectedShape(_hint);
         }
-
+        public void MouseDoubleClick(Model m, int x, int y)
+        {
+            //nothing
+        }
         public void OnPaint(Model m, IGraphics g)
         {
             g.ClearAll();
