@@ -18,9 +18,11 @@ namespace DrawingModel
         public event ModelChangedEventHandler _selectedShapeEvent = delegate { };
         public event ModelChangedEventHandler _selectingCompletedEvent = delegate { };
         public event ModelChangedEventHandler _selectingEvent = delegate { };
+        public event ModelChangedEventHandler _editShapeTextEvent = delegate { };
 
         ShapeFactory _shapeFactory = new ShapeFactory();
         List<Shape> _shapes = new List<Shape>();
+        List<Line> _lines = new List<Line>();
 
         PointerState _pointerState;
         DrawingState.DrawingState _drawingState;
@@ -39,9 +41,13 @@ namespace DrawingModel
             _pointerState._selectedShapeEvent += delegate { _selectedShapeEvent(); };
             _pointerState._movingShapesEvent += delegate { _movingShapesEvent(); };
             _pointerState._movedShapesEvent += delegate { _movedShapesEvent(); };
+            _pointerState._editShapeTextEvent += delegate { _editShapeTextEvent(); };
 
             _drawingState._selectingEvent += delegate { _selectingEvent(); };
             _drawingState._selectingCompletedEvent += delegate { _selectingCompletedEvent(); };
+
+            _lineState._selectingEvent += delegate { _selectingEvent(); };
+            _lineState._selectingCompletedEvent += delegate { _selectingCompletedEvent(); };
 
             EnterPointerState();
         }
@@ -107,7 +113,19 @@ namespace DrawingModel
 
         public void OnPaint(IGraphics g)
         {
-            _currentState.OnPaint(this, g);
+            g.ClearAll();
+            foreach (Shape shape in _shapes)
+            {
+                ((IDrawable)shape).Draw(g);
+                shape.DrawText(g);
+                shape.DrawTextBoxFrame(g);
+                shape.DrawTextBoxMovePoint(g);
+            }
+            foreach (Line line in _lines)
+            {
+                ((IDrawable)line).Draw(g);
+            }
+            _currentState.OnPaint(this, g);     
         }
 
         public void AddShape(in ShapeType shapeType, in string[] inputDatas)
@@ -129,6 +147,11 @@ namespace DrawingModel
             _shapes.RemoveAt(index);
             _removedShapeIndex = index;
             _removedShapeEvent();
+        }
+
+        public void AddLine(in Line line)
+        {
+            _lines.Add(line);
         }
     }
 }

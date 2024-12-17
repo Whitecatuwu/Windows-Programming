@@ -11,6 +11,7 @@ namespace DrawingState
         public event ModelChangedEventHandler _movingShapesEvent = delegate { };
         public event ModelChangedEventHandler _movedShapesEvent = delegate { };
         public event ModelChangedEventHandler _selectedShapeEvent = delegate { };
+        public event ModelChangedEventHandler _editShapeTextEvent = delegate { };
 
         SortedSet<Shape> _selectedShapes = new SortedSet<Shape>();
         const int CTRL_KEY = 17;
@@ -117,9 +118,9 @@ namespace DrawingState
         {
             foreach (Shape shape in m.Shapes.Reverse())
             {
-                if (shape.IsTouchMovePoint(x, y))
+                if (shape.IsTouchMovePoint(x,y))
                 {
-                   // _touchedTextBoxShape = shape;
+                    _editShapeTextEvent();
                     return;
                 }
             }
@@ -127,14 +128,6 @@ namespace DrawingState
 
         public void OnPaint(Model m, IGraphics g)
         {
-            g.ClearAll();
-            foreach (Shape shape in m.Shapes)
-            {
-                ((IDrawable)shape).Draw(g);
-                shape.DrawText(g);
-                shape.DrawTextBoxFrame(g);
-                shape.DrawTextBoxMovePoint(g);
-            }
             foreach (Shape selectedShape in _selectedShapes)
             {
                 selectedShape.DrawFrame(g);

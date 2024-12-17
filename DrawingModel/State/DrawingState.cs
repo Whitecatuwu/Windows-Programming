@@ -77,14 +77,6 @@ namespace DrawingState
         }
         public void OnPaint(Model m, IGraphics g)
         {
-            g.ClearAll();
-            foreach (Shape shape in m.Shapes)
-            {
-                ((IDrawable)shape).Draw(g);
-                shape.DrawText(g);
-                shape.DrawTextBoxFrame(g);
-                shape.DrawTextBoxMovePoint(g);
-            }
             if (_hint != null)
             {
                 ((IDrawable)_hint).Draw(g);

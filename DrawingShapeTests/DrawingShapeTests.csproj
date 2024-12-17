@@ -56,6 +56,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DecisionTests.cs" />
+    <Compile Include="LineTests.cs" />
     <Compile Include="MockGraphics.cs" />
     <Compile Include="ProcessTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

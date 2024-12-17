@@ -172,7 +172,15 @@ namespace DrawingState.Tests
         [TestMethod()]
         public void MouseDoubleClickTest()
         {
-            Assert.Fail();
+            PointerState pointerState = new PointerState();
+            pointerState.Initialize(m);
+
+            Terminator term = new Terminator(ShapeType.TERMINATOR, new string[] { "terminatorTest", "1", "1", "100", "300" });
+
+            pointerState.AddSelectedShape(term);
+
+            pointerState.MouseDoubleClick(m, 0, 0);
+            pointerState.MouseDoubleClick(m, 151, 43);
         }
 
         [TestMethod()]

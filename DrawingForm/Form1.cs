@@ -39,6 +39,7 @@ namespace DrawingForm
             _model._selectedShapeEvent += UpdateView;
             _model._movedShapesEvent += UpdateGridView;
             _model._movingShapesEvent += UpdateView;
+            _model._editShapeTextEvent += delegate {};
 
             this._pModel = new PresentationModel.PresentationModel(_model);
             _pModel._changedModeEvent += RefreshToolStrip;
@@ -133,6 +134,7 @@ namespace DrawingForm
             toolStripProcessButton.Checked = _pModel.IsProcessEnable;
             toolStripDecisionButton.Checked = _pModel.IsDecisionEnable;
             toolStripSelectButton.Checked = _pModel.IsSelectEnable;
+            toolStripLineButton.Checked = _pModel.IsLineEnable;
         }
 
         private void toolStripStartButton_Click(object sender, EventArgs e)
@@ -158,6 +160,20 @@ namespace DrawingForm
         private void toolStripSelectButton_Click(object sender, EventArgs e)
         {
             _pModel.SetDrawingMode(DrawingMode.POINTER);
+        }
+        private void toolStripLineButton_Click(object sender, EventArgs e)
+        {
+            _pModel.SetDrawingMode(DrawingMode.LINE);
+        }
+
+        private void toolStripRedoButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripUndoButton_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void TextBoxText_TextChanged(object sender, EventArgs e)

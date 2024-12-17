@@ -73,6 +73,9 @@
     <Compile Include="..\DrawingShape\IDrawable.cs">
       <Link>Shapes\IDrawable.cs</Link>
     </Compile>
+    <Compile Include="..\DrawingShape\Line.cs">
+      <Link>Shapes\Line.cs</Link>
+    </Compile>
     <Compile Include="..\DrawingShape\Process.cs">
       <Link>Shapes\Process.cs</Link>
     </Compile>

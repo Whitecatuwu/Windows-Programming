@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using System.Windows.Forms;
 using System.Drawing;
 using DrawingModel;
 
@@ -100,6 +94,11 @@ namespace DrawingForm.PresentationModel
         public void DrawPoint(in int x, in int y, in int r)
         {
             _graphics.FillEllipse(Brushes.Orange, x, y, r, r);
+        }
+
+        public void DrawLine(in int x1, in int y1, in int x2, in int y2)
+        {
+            _graphics.DrawLine(_pen, x1, y1, x2, y2);
         }
 
         private void Normalize(in int[] datas, out int[] result)

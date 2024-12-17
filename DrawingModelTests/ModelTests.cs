@@ -1,8 +1,9 @@
-﻿using DrawingModel;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using DrawingShape;
 using DrawingShapeTests;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DrawingModel.Tests
 {
@@ -32,7 +33,8 @@ namespace DrawingModel.Tests
         [TestMethod()]
         public void EnterLineStateTest()
         {
-            Assert.Fail();
+            Model model = new Model();
+            model.EnterLineState();
         }
 
         [TestMethod()]
@@ -67,6 +69,7 @@ namespace DrawingModel.Tests
         public void OnPaintTest()
         {
             Model model = new Model();
+            model.AddShape(new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" }));
             model.OnPaint(new MockGraphics());
         }
 
@@ -96,6 +99,20 @@ namespace DrawingModel.Tests
             model.AddShape(new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" }));
             model.RemoveShape(1);
             Assert.AreEqual(model.RemovedShapeIndex, 1);
+        }
+        [TestMethod()]
+        public void AddLineTest()
+        {
+            Model model = new Model();
+            Line line = new Line();
+            line.FirstX = 114;
+            line.FirstY = 514;
+            line.SecondX = 191;
+            line.SecondY = 861;
+            model.AddLine(line);
+            PrivateObject privateObject = new PrivateObject(model);
+            List<Line> lines = (List<Line>)privateObject.GetFieldOrProperty("_lines");    
+            Assert.AreEqual(1, lines.Count());
         }
     }
 }

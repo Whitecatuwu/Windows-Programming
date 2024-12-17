@@ -1,10 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DrawingForm.PresentationModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DrawingModel;
 using DrawingShape;
 
@@ -51,6 +45,9 @@ namespace DrawingForm.PresentationModel.Tests
 
             presentationModel.SetDrawingMode(DrawingMode.PROCESS);
             Assert.IsTrue(presentationModel.IsProcessEnable);
+
+            presentationModel.SetDrawingMode(DrawingMode.LINE);
+            Assert.IsTrue(presentationModel.IsLineEnable);
         }
 
         [TestMethod()]

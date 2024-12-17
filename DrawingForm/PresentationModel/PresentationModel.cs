@@ -65,6 +65,11 @@ namespace DrawingForm.PresentationModel
         {
             get { return _drawingModeSwitch[4]; }
         }
+
+        public bool IsLineEnable
+        {
+            get { return _drawingModeSwitch[5]; }
+        }
         //------------Inputs State------------
 
         public int GetXStateColor
