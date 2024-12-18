@@ -57,6 +57,10 @@ namespace DrawingShape.Tests
             Assert.AreEqual(test.TextBox_Y, 861);
 
             Assert.AreEqual(process.Id, privateProcess.GetFieldOrProperty("_id"));
+
+            test.Text = "114514";
+            Assert.AreEqual(test.Text, "114514");
+
         }
 
         [TestMethod()]
@@ -130,6 +134,24 @@ namespace DrawingShape.Tests
         {
             MockGraphics mock = new MockGraphics();
             process.DrawTextBoxMovePoint(mock);
+        }
+
+        [TestMethod()]
+        public void DrawConnectionPointsTest()
+        {
+            MockGraphics mock = new MockGraphics();
+            process.DrawConnectionPoints(mock);
+            process.Touched = true;
+            process.DrawConnectionPoints(mock);
+            process.Touched = process.Touched;
+        }
+
+        [TestMethod()]
+        public void TouchConnectPointTest()
+        {
+            process = new Process(ShapeType.PROCESS, new string[] { "ProcessTest", "1", "1", "100", "100" });
+            process.TouchConnectPoint(1 + 50 - 5, 1 - 5);
+            process.TouchConnectPoint(114, 514);
         }
     }
 }

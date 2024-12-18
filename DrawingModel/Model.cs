@@ -19,11 +19,16 @@ namespace DrawingModel
         public event ModelChangedEventHandler _selectedShapeEvent = delegate { };
         public event ModelChangedEventHandler _selectingCompletedEvent = delegate { };
         public event ModelChangedEventHandler _selectingEvent = delegate { };
+        public event ModelChangedEventHandler _selectingFailedEvent = delegate { };
         public event ModelChangedEventHandler _editShapeTextEvent = delegate { };
+        public event ModelChangedEventHandler _shapeTextEditedEvent = delegate { };
         public event ModelChangedEventHandler _insertedShapeEvent = delegate { };
         public event ModelChangedEventHandler _commandExecutedEvent = delegate { };
+        public event ModelChangedEventHandler _addedLineEvent = delegate { };
+        public event ModelChangedEventHandler _removedLineEvent = delegate { };
+        public event ModelChangedEventHandler _touchedShapeEvent = delegate { };
 
-       ShapeFactory _shapeFactory = new ShapeFactory();
+        ShapeFactory _shapeFactory = new ShapeFactory();
         CommandManager _commandManager = new CommandManager();
 
         List<Shape> _shapes = new List<Shape>();
@@ -37,6 +42,7 @@ namespace DrawingModel
         int _removedShapeIndex = -1;
         int _updatedShapeIndex = -1;
         int _insertedShapeIndex = -1;
+        int _textEditShapeIndex = -1;
 
         public Model()
         {
@@ -51,9 +57,12 @@ namespace DrawingModel
 
             _drawingState._selectingEvent += delegate { _selectingEvent(); };
             _drawingState._selectingCompletedEvent += delegate { _selectingCompletedEvent(); };
+            _drawingState._selectingFailedEvent += delegate { _selectingFailedEvent(); };
 
             _lineState._selectingEvent += delegate { _selectingEvent(); };
             _lineState._selectingCompletedEvent += delegate { _selectingCompletedEvent(); };
+            _lineState._touchShapeEvent += delegate { _touchedShapeEvent(); };
+            _lineState._selectingFailedEvent += delegate { _selectingFailedEvent(); };
 
             EnterPointerState();
         }
@@ -84,6 +93,12 @@ namespace DrawingModel
             get { return _insertedShapeIndex; }
         }
 
+        public int TextEditShapeIndex
+        {
+            set { _textEditShapeIndex = value; }
+            get { return _textEditShapeIndex; }
+        }
+
         public bool IsRedoEnabled
         {
             get { return _commandManager.IsRedoEnabled; }
@@ -98,6 +113,7 @@ namespace DrawingModel
         {
             _pointerState.Initialize(this);
             _currentState = _pointerState;
+
         }
 
         public void EnterDrawingState(ShapeType shapeType)
@@ -194,9 +210,44 @@ namespace DrawingModel
             _insertedShapeEvent();
         }
 
+        public void MoveShape(in Shape shape, in int x, in int y)
+        {
+            int index = _shapes.IndexOf(shape);
+            if (index < 0) return;
+            shape.X = x;
+            shape.Y = y;
+            UpdatedShapeIndex = index;
+            _movedShapesEvent();
+        }
+
+        public void MoveTextBox(in Shape shape, in int x, in int y)
+        {
+            int index = _shapes.IndexOf(shape);
+            if (index < 0) return;
+            shape.TextBox_X = x;
+            shape.TextBox_Y = y;
+            UpdatedShapeIndex = index;
+            _movedShapesEvent();
+        }
+
         public void AddLine(in Line line)
         {
             _lines.Add(line);
+            _addedLineEvent();
+        }
+
+        public void RemoveLine(in Line line)
+        {
+            if (_lines.Remove(line))
+                _removedLineEvent();
+        }
+
+        public void EditShapeText(in string text)
+        {
+            if (_textEditShapeIndex < 0) return;
+            _shapes[_textEditShapeIndex].Text = text;
+            _updatedShapeIndex = _textEditShapeIndex;
+            _shapeTextEditedEvent();
         }
 
         public void ExeCommand(ICommand cmd)

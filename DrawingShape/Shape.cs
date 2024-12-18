@@ -1,5 +1,6 @@
 ﻿using DrawingModel;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace DrawingShape
@@ -28,15 +29,7 @@ namespace DrawingShape
             _textBox_Y = _y + _height / 2;
             _textBox_H = 15;
             _textBox_W = 120;
-
-            _textBoxMovePoint_X = _textBox_X;
-            _textBoxMovePoint_Y = _textBox_Y - _textBox_H / 2;
-
-
-            _connectionPoints[0] = (_x + _width / 2, _y);
-            _connectionPoints[1] = (_x + _width, _y + _height / 2);
-            _connectionPoints[2] = (_x + _width / 2, _y + _height);
-            _connectionPoints[3] = (_x, _y + _height / 2);
+            Abjust();
         }
 
         protected ShapeType _shapeType;
@@ -54,7 +47,11 @@ namespace DrawingShape
         protected int _textBoxMovePoint_X;
         protected int _textBoxMovePoint_Y;
 
-        protected (int X, int Y)[] _connectionPoints = new (int X, int Y)[4] { (0, 0), (0, 0), (0, 0), (0, 0) }; // up, right, down, left
+        protected int[] _connectionPointXs = new int[4]; // up, right, down, left
+        protected int[] _connectionPointYs = new int[4]; // up, right, down, left
+        protected bool _touched = false;
+
+        //protected Line[] _connectedLines = new Line[4];
 
         const int POINT_RADIUS = 10;
 
@@ -64,6 +61,7 @@ namespace DrawingShape
         }
         public string Text
         {
+            set { _text = value; }
             get { return _text; }
         }
         public string Id
@@ -76,6 +74,7 @@ namespace DrawingShape
             {
                 TextBox_X += value - _x;
                 _x = value;
+                Abjust();
             }
             get { return _x; }
         }
@@ -85,6 +84,7 @@ namespace DrawingShape
             {
                 TextBox_Y += value - _y;
                 _y = value;
+                Abjust();
             }
             get { return _y; }
         }
@@ -94,7 +94,7 @@ namespace DrawingShape
             {
                 _height = value;
                 TextBox_Y = _y + _height / 2;
-                //_textBoxMovePoint_Y = _textBox_Y - _textBox_H / 2;
+                Abjust();
             }
             get { return _height; }
         }
@@ -104,7 +104,7 @@ namespace DrawingShape
             {
                 _width = value;
                 TextBox_X = _x + _width / 2;
-                //_textBoxMovePoint_X = _textBox_X;
+                Abjust();
             }
             get { return _width; }
         }
@@ -132,6 +132,11 @@ namespace DrawingShape
         public int[] ShapeDatas
         {
             get { return new int[] { _x, _y, _height, _width }; }
+        }
+        public bool Touched
+        {
+            set { _touched = value; }
+            get { return _touched; }
         }
 
         public void DrawFrame(IGraphics graphics)
@@ -183,6 +188,54 @@ namespace DrawingShape
         public void DrawTextBoxMovePoint(IGraphics graphics)
         {
             graphics.DrawPoint(_textBoxMovePoint_X, _textBoxMovePoint_Y, POINT_RADIUS);
+        }
+
+        public void DrawConnectionPoints(IGraphics graphics)
+        {
+            if (!_touched) return;
+            for (int i = 0; i < 4; i++)
+            {
+                graphics.DrawPoint(_connectionPointXs[i], _connectionPointYs[i], POINT_RADIUS);
+            }
+        }
+        public int TouchConnectPoint(int x, int y)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                ref int cx = ref _connectionPointXs[i];
+                ref int cy = ref _connectionPointYs[i];
+                if ((x - cx) * (x - cx) + (y - cy) * (y - cy) <= POINT_RADIUS * POINT_RADIUS)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        /*public void SetConnectLine(in int number,Line)
+        {
+            _connectedLines[number]
+        }*/
+
+        private void Abjust()
+        {
+            /*_textBox_X = _x + _width / 2;
+            _textBox_Y = _y + _height / 2;
+            _textBox_H = 15;
+            _textBox_W = 120;*/
+
+            _textBoxMovePoint_X = _textBox_X;
+            _textBoxMovePoint_Y = _textBox_Y - _textBox_H / 2;
+
+            _connectionPointXs[0] = _x + _width / 2 - POINT_RADIUS / 2;
+            _connectionPointXs[1] = _x + _width - POINT_RADIUS / 2;
+            _connectionPointXs[2] = _x + _width / 2 - POINT_RADIUS / 2;
+            _connectionPointXs[3] = _x - POINT_RADIUS / 2;
+
+            _connectionPointYs[0] = _y - POINT_RADIUS / 2;
+            _connectionPointYs[1] = _y + _height / 2 - POINT_RADIUS / 2;
+            _connectionPointYs[2] = _y + _height - POINT_RADIUS / 2;
+            _connectionPointYs[3] = _y + _height / 2 - POINT_RADIUS / 2;
         }
     }
 }

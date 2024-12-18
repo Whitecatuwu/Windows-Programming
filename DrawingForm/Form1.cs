@@ -5,6 +5,8 @@ using System.Windows.Forms;
 using DrawingModel;
 using DrawingForm.PresentationModel;
 using DrawingCommand;
+using Hw2;
+using System.Runtime.InteropServices;
 
 namespace DrawingForm
 {
@@ -37,13 +39,20 @@ namespace DrawingForm
             _model._insertedShapeEvent += UpdateView;
             _model._selectingCompletedEvent += UpdateView;
             _model._selectingCompletedEvent += delegate { Cursor = Cursors.Default; };
+            _model._selectingFailedEvent += UpdateView;
             _model._selectingEvent += UpdateView;
             _model._selectingEvent += delegate { Cursor = Cursors.Cross; };
             _model._selectedShapeEvent += UpdateView;
             _model._movedShapesEvent += UpdateGridView;
+            _model._movedShapesEvent += UpdateView;
             _model._movingShapesEvent += UpdateView;
-            _model._editShapeTextEvent += delegate {};
+            _model._editShapeTextEvent += TextEdit;
+            _model._shapeTextEditedEvent += UpdateView;
+            _model._shapeTextEditedEvent += UpdateGridView;
             _model._commandExecutedEvent += RefreshToolStrip;
+            _model._addedLineEvent += UpdateView;
+            _model._removedLineEvent += UpdateView;
+            _model._touchedShapeEvent += UpdateView;
 
             this._pModel = new PresentationModel.PresentationModel(_model);
             _pModel._changedModeEvent += RefreshToolStrip;
@@ -217,6 +226,16 @@ namespace DrawingForm
         {
             _pModel.InputData(4, ((TextBox)sender).Text);
             labelW.ForeColor = Color.FromArgb(_pModel.GetWStateColor);
+        }
+
+        private void TextEdit()
+        {
+            TextEditForm textEditForm = new TextEditForm();
+            DialogResult dialogResult = textEditForm.ShowDialog();
+            if (dialogResult == DialogResult.OK)
+            {
+                _model.ExeCommand(new TextChangeCommand(_model, textEditForm.GetText()));
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using DrawingModel;
+﻿using DrawingCommand;
+using DrawingModel;
 using DrawingShape;
+using System.Linq;
 
 namespace DrawingState
 {
@@ -8,6 +10,8 @@ namespace DrawingState
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler _selectingEvent = delegate { };
         public event ModelChangedEventHandler _selectingCompletedEvent = delegate { };
+        public event ModelChangedEventHandler _selectingFailedEvent = delegate { };
+        public event ModelChangedEventHandler _touchShapeEvent = delegate { };
 
         int _firstX;
         int _firstY;
@@ -15,6 +19,8 @@ namespace DrawingState
         int _secondY;
         bool _isPressed = false;
         Line _hint = null;
+
+        Shape _touchedShape = null;
 
         public void Initialize(Model m)
         {
@@ -29,6 +35,10 @@ namespace DrawingState
             {
                 ((IDrawable)_hint).Draw(g);
             }
+            if (_touchedShape != null)
+            {
+                _touchedShape.DrawConnectionPoints(g);
+            }
         }
         public void MouseDown(Model m, int x, int y)
         {
@@ -38,13 +48,40 @@ namespace DrawingState
         }
         public void MouseMove(Model m, int x, int y)
         {
+            foreach (Shape shape in m.Shapes.Reverse())
+            {
+                if (((IDrawable)shape).IsPointInRange(x, y))
+                {
+                    _touchedShape = shape;
+                    _touchedShape.Touched = true;
+                    _touchShapeEvent();
+                    break;
+                }
+                if (_touchedShape != null)
+                {
+                    _touchedShape.Touched = false;
+                    _touchedShape = null;
+                    _touchShapeEvent();
+                }
+            }
+
             if (!_isPressed) return;
             if (_secondX == x && _secondY == y) return;
             if (_hint == null)
             {
-                _hint = new Line();
-                _hint.FirstX = _firstX;
-                _hint.FirstY = _firstY;
+                foreach (Shape shape in m.Shapes.Reverse())
+                {
+                    int num = shape.TouchConnectPoint(x, y);
+                    if (num != -1)
+                    {
+                        _hint = new Line();
+                        _hint.FirstX = _firstX;
+                        _hint.FirstY = _firstY;
+                        _hint.ConnectedFirstShape = shape;
+                        _hint.ConnectedFirstShapePointNumber = num;
+                        return;
+                    }
+                }
                 return;
             }
             _hint.SecondX = x;
@@ -58,11 +95,27 @@ namespace DrawingState
 
             if (_hint == null || (_hint.FirstX == _hint.SecondX && _hint.FirstY == _hint.SecondY))
             {
-                _selectingCompletedEvent();
+                _selectingFailedEvent();
                 return;
             }
-            m.AddLine(_hint);
-            _selectingCompletedEvent();
+            foreach (Shape shape in m.Shapes.Reverse())
+            {
+                int num = shape.TouchConnectPoint(x, y);
+                if (num != -1)
+                {
+                    if (_hint.ConnectedFirstShape.CompareTo(shape) == 0 && _hint.ConnectedFirstShapePointNumber == num)
+                    {
+                        return;
+                    }
+                    _hint.ConnectedSecondShape = shape;
+                    _hint.ConnectedSecondShapePointNumber = num;
+                    //m.AddLine(_hint);
+                    m.ExeCommand(new AddLineCommand(m, _hint));
+                    _selectingCompletedEvent();
+                }
+            }
+            _hint = null;
+            _selectingFailedEvent();
         }
 
         public void MouseDoubleClick(Model m, int x, int y)

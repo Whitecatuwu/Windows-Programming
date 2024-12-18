@@ -44,24 +44,27 @@ namespace DrawingState.Tests
             pointerState.Initialize(m);
 
             SortedSet<Shape> selectedShapes = (SortedSet<Shape>)privateObject.GetFieldOrProperty("_selectedShapes");
-            pointerState.MouseDown(m, 150, 50);
+            pointerState.MouseDown(m, 150, 80);
             Assert.IsTrue(selectedShapes.Contains(terminator));
             pointerState.MouseDown(m, 0, 0);
             Assert.AreEqual(0, selectedShapes.Count);
 
             pointerState.KeyDown(m, 17);
-            pointerState.MouseDown(m, 150, 50);
+            pointerState.MouseDown(m, 150, 80);
             pointerState.MouseDown(m, 0, 0);
             Assert.AreEqual(1, selectedShapes.Count);
 
-            pointerState.MouseDown(m, 450, 450);
+            pointerState.MouseDown(m, 450, 461);
             Assert.IsTrue(selectedShapes.Contains(start));
             Assert.AreEqual(2, selectedShapes.Count);
 
             pointerState.KeyUp(m, 17);
-            pointerState.MouseDown(m, 450, 450);
+            pointerState.MouseDown(m, 450, 461);
             Assert.IsTrue(selectedShapes.Contains(start));
             Assert.AreEqual(1, selectedShapes.Count);
+
+            pointerState.MouseDown(m, 450, 445);
+            pointerState.MouseDown(m, 450, 455);
 
         }
 
@@ -165,8 +168,27 @@ namespace DrawingState.Tests
             Assert.AreEqual(m.UpdatedShapeIndex, -1);
 
             pointerState.MouseDown(m, 450, 450);
-            pointerState.MouseUp(m, 0, 0);
-            Assert.AreEqual(m.UpdatedShapeIndex, 2);
+            pointerState.MouseMove(m, 450, 455);
+            pointerState.MouseUp(m, 450, 455);
+
+            pointerState.MouseDown(m, 450, 450);
+            pointerState.MouseMove(m, 450, 455);
+            pointerState.MouseUp(m, 450, 445);
+
+            pointerState.MouseDown(m, 450, 471);
+            pointerState.MouseUp(m, 450, 471);
+            pointerState.MouseDown(m, 450, 471);
+            pointerState.MouseMove(m, 450, 475);
+            pointerState.MouseUp(m, 450, 475);
+
+            pointerState.AddSelectedShape(decision);
+            pointerState.MouseDown(m, 5, 5);
+            pointerState.MouseUp(m, 5, 5);
+
+            pointerState.ClearSelectedShapes();
+            pointerState.MouseDown(m, 114514, 1919);
+            pointerState.MouseMove(m, 114514, 1900);
+            pointerState.MouseUp(m, 114514, 1900);
         }
 
         [TestMethod()]

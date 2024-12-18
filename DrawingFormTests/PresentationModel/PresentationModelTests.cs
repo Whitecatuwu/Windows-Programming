@@ -48,6 +48,9 @@ namespace DrawingForm.PresentationModel.Tests
 
             presentationModel.SetDrawingMode(DrawingMode.LINE);
             Assert.IsTrue(presentationModel.IsLineEnable);
+
+            Assert.IsFalse(presentationModel.IsRedoEnable);
+            Assert.IsFalse(presentationModel.IsUndoEnable);
         }
 
         [TestMethod()]

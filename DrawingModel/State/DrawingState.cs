@@ -11,6 +11,7 @@ namespace DrawingState
         public delegate void ModelChangedEventHandler();
         public event ModelChangedEventHandler _selectingEvent = delegate { };
         public event ModelChangedEventHandler _selectingCompletedEvent = delegate { };
+        public event ModelChangedEventHandler _selectingFailedEvent = delegate { };
 
         const int SHIFT_KEY = 160;
         int _firstX;
@@ -34,7 +35,6 @@ namespace DrawingState
         {
             set { _hintShapeType = value; }
         }
-
 
         public void Initialize(Model m)
         {
@@ -65,7 +65,7 @@ namespace DrawingState
 
             if (_hint == null || _hint.Height == 0 || _hint.Width == 0)
             {
-                _selectingCompletedEvent();
+                _selectingFailedEvent();
                 return;
             }
             _hint.Normalize();

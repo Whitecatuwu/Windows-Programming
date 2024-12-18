@@ -64,6 +64,7 @@
     <Compile Include="..\DrawingShape\Terminator.cs">
       <Link>Shape\Terminator.cs</Link>
     </Compile>
+    <Compile Include="Command\AddLineCommand.cs" />
     <Compile Include="Command\AddShapeCommand.cs" />
     <Compile Include="Command\CommandManager.cs" />
     <Compile Include="Command\DeleteShapeCommand.cs" />

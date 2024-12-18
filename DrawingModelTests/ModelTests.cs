@@ -5,6 +5,8 @@ using DrawingShape;
 using DrawingShapeTests;
 using System.Collections.Generic;
 using System.Linq;
+using DrawingCommand;
+using System.Runtime.InteropServices;
 
 namespace DrawingModel.Tests
 {
@@ -168,7 +170,108 @@ namespace DrawingModel.Tests
         [TestMethod()]
         public void ExeCommandTest()
         {
-            Assert.Fail();
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+
+            model.ExeCommand(new AddShapeCommand(model, ShapeType.START, new string[] { "DecisionTest", "10", "10", "100", "100" }));
+        }
+
+        [TestMethod()]
+        public void MoveShapeTest()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+            var shape = new Start(ShapeType.START, new string[] { "STARTTest", "2", "1", "100", "100" });
+            model.AddShape(shape);
+
+            model.MoveShape(shape, 114, 514);
+            Assert.AreEqual(shape.X, 114);
+            Assert.AreEqual(shape.Y, 514);
+
+            model.MoveShape(null, 114, 514);
+        }
+
+        [TestMethod()]
+        public void RedoTest()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+
+            model.ExeCommand(new AddShapeCommand(model, ShapeType.START, new string[] { "DecisionTest", "10", "10", "100", "100" }));
+            Assert.IsTrue(model.IsUndoEnabled);
+            model.Undo();
+            Assert.IsTrue(model.IsRedoEnabled);
+            model.Redo();
+            Assert.IsFalse(model.IsRedoEnabled);
+            Assert.IsTrue(model.IsUndoEnabled);
+        }
+
+        [TestMethod()]
+        public void UndoTest()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+
+            model.ExeCommand(new AddShapeCommand(model, ShapeType.START, new string[] { "DecisionTest", "10", "10", "100", "100" }));
+            Assert.IsTrue(model.IsUndoEnabled);
+            model.Undo();
+            Assert.IsTrue(model.IsRedoEnabled);
+        }
+
+        [TestMethod()]
+        public void EditShapeTextTest()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+
+            model.EditShapeText("qwertyui");
+            model.TextEditShapeIndex = 0;
+            model.EditShapeText("qwertyui");
+            Assert.AreEqual(model.Shapes[0].Text, "qwertyui");
+
+        }
+
+        [TestMethod()]
+        public void MoveTextBoxTest()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+            var shape = new Start(ShapeType.START, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+
+            model.MoveTextBox(new Start(ShapeType.START, new string[] { "TERMINATORTest", "1", "1", "100", "100" }), 114, 514);
+            model.AddShape(shape);
+            model.MoveTextBox(shape, 114, 514);
+            Assert.AreEqual(shape.TextBox_X, 114);
+            Assert.AreEqual(shape.TextBox_Y, 514);
+
+        }
+
+        [TestMethod()]
+        public void RemoveLineTest()
+        {
+            Model model = new Model();
+            Line line = new Line();
+            line.FirstX = 114;
+            line.FirstY = 514;
+            line.SecondX = 191;
+            line.SecondY = 861;
+            model.AddLine(line);
+            model.RemoveLine(line);
+            PrivateObject privateObject = new PrivateObject(model);
+            List<Line> lines = (List<Line>)privateObject.GetFieldOrProperty("_lines");
+            Assert.AreEqual(0, lines.Count());
         }
     }
 }

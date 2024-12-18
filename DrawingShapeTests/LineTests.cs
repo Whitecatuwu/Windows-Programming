@@ -25,6 +25,16 @@ namespace DrawingShape.Tests
             Assert.AreEqual(line.SecondX, 191);
             Assert.AreEqual(line.SecondY, 861);
 
+            line.ConnectedFirstShape = null;
+            line.ConnectedFirstShapePointNumber = -1;
+            line.ConnectedSecondShape = null;
+            line.ConnectedSecondShapePointNumber = -1;
+
+            line.ConnectedFirstShape = line.ConnectedFirstShape;
+            line.ConnectedFirstShapePointNumber = line.ConnectedFirstShapePointNumber;
+            line.ConnectedSecondShape = line.ConnectedSecondShape;
+            line.ConnectedSecondShapePointNumber = line.ConnectedSecondShapePointNumber;
+
         }
 
         [TestMethod()]
