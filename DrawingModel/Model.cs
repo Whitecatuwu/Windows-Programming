@@ -2,6 +2,7 @@
 using System.Linq;
 using DrawingShape;
 using DrawingState;
+using DrawingCommand;
 
 
 namespace DrawingModel
@@ -19,8 +20,12 @@ namespace DrawingModel
         public event ModelChangedEventHandler _selectingCompletedEvent = delegate { };
         public event ModelChangedEventHandler _selectingEvent = delegate { };
         public event ModelChangedEventHandler _editShapeTextEvent = delegate { };
+        public event ModelChangedEventHandler _insertedShapeEvent = delegate { };
+        public event ModelChangedEventHandler _commandExecutedEvent = delegate { };
 
-        ShapeFactory _shapeFactory = new ShapeFactory();
+       ShapeFactory _shapeFactory = new ShapeFactory();
+        CommandManager _commandManager = new CommandManager();
+
         List<Shape> _shapes = new List<Shape>();
         List<Line> _lines = new List<Line>();
 
@@ -31,6 +36,7 @@ namespace DrawingModel
 
         int _removedShapeIndex = -1;
         int _updatedShapeIndex = -1;
+        int _insertedShapeIndex = -1;
 
         public Model()
         {
@@ -73,6 +79,21 @@ namespace DrawingModel
             get { return _updatedShapeIndex; }
         }
 
+        public int InsertedShapeIndex
+        {
+            get { return _insertedShapeIndex; }
+        }
+
+        public bool IsRedoEnabled
+        {
+            get { return _commandManager.IsRedoEnabled; }
+        }
+
+        public bool IsUndoEnabled
+        {
+            get { return _commandManager.IsUndoEnabled; }
+        }
+
         public void EnterPointerState()
         {
             _pointerState.Initialize(this);
@@ -106,7 +127,7 @@ namespace DrawingModel
         {
             _currentState.MouseUp(this, x, y);
         }
-        public void MouseDoubleClick(int x,int y)
+        public void MouseDoubleClick(int x, int y)
         {
             _currentState.MouseDoubleClick(this, x, y);
         }
@@ -125,7 +146,7 @@ namespace DrawingModel
             {
                 ((IDrawable)line).Draw(g);
             }
-            _currentState.OnPaint(this, g);     
+            _currentState.OnPaint(this, g);
         }
 
         public void AddShape(in ShapeType shapeType, in string[] inputDatas)
@@ -149,9 +170,51 @@ namespace DrawingModel
             _removedShapeEvent();
         }
 
+        public void RemoveShape(Shape shape)
+        {
+            int index = _shapes.IndexOf(shape);
+            if (index >= 0)
+            {
+                RemoveShape(index);
+            }
+        }
+
+        public void InsertShape(in int index, in ShapeType shapeType, in string[] inputDatas)
+        {
+            Shape shape = _shapeFactory.CreateShape(shapeType, inputDatas);
+            _shapes.Insert(index, shape);
+            _insertedShapeIndex = index;
+            _insertedShapeEvent();
+        }
+
+        public void InsertShape(in int index, Shape shape)
+        {
+            _shapes.Insert(index, shape);
+            _insertedShapeIndex = index;
+            _insertedShapeEvent();
+        }
+
         public void AddLine(in Line line)
         {
             _lines.Add(line);
+        }
+
+        public void ExeCommand(ICommand cmd)
+        {
+            _commandManager.Execute(cmd);
+            _commandExecutedEvent();
+        }
+
+        public void Redo()
+        {
+            _commandManager.Redo();
+            _commandExecutedEvent();
+        }
+
+        public void Undo()
+        {
+            _commandManager.Undo();
+            _commandExecutedEvent();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using DrawingModel;
 using DrawingForm.PresentationModel;
+using DrawingCommand;
 
 namespace DrawingForm
 {
@@ -32,6 +33,8 @@ namespace DrawingForm
             _model._addedShapeEvent += UpdateView;
             _model._removedShapeEvent += UpdateView;
             _model._removedShapeEvent += RemoveGridViewRow;
+            _model._insertedShapeEvent += InsertGridView;
+            _model._insertedShapeEvent += UpdateView;
             _model._selectingCompletedEvent += UpdateView;
             _model._selectingCompletedEvent += delegate { Cursor = Cursors.Default; };
             _model._selectingEvent += UpdateView;
@@ -40,6 +43,7 @@ namespace DrawingForm
             _model._movedShapesEvent += UpdateGridView;
             _model._movingShapesEvent += UpdateView;
             _model._editShapeTextEvent += delegate {};
+            _model._commandExecutedEvent += RefreshToolStrip;
 
             this._pModel = new PresentationModel.PresentationModel(_model);
             _pModel._changedModeEvent += RefreshToolStrip;
@@ -68,7 +72,8 @@ namespace DrawingForm
         {
             if (e.RowIndex >= 0 && e.ColumnIndex == 0)
             {
-                _model.RemoveShape(e.RowIndex);
+                //_model.RemoveShape(e.RowIndex);
+                _model.ExeCommand(new DeleteShapeCommand(_model, e.RowIndex));
             }
         }
 
@@ -89,6 +94,13 @@ namespace DrawingForm
             int index = _model.UpdatedShapeIndex;
             string[] row = new string[] { "刪除" }.Concat(_pModel.GetShapeData(index)).ToArray();
             shapeGridView.Rows.RemoveAt(index);
+            shapeGridView.Rows.Insert(index, row);
+        }
+
+        private void InsertGridView()
+        {
+            int index = _model.InsertedShapeIndex;
+            string[] row = new string[] { "刪除" }.Concat(_pModel.GetShapeData(index)).ToArray();
             shapeGridView.Rows.Insert(index, row);
         }
 
@@ -135,6 +147,8 @@ namespace DrawingForm
             toolStripDecisionButton.Checked = _pModel.IsDecisionEnable;
             toolStripSelectButton.Checked = _pModel.IsSelectEnable;
             toolStripLineButton.Checked = _pModel.IsLineEnable;
+            toolStripRedoButton.Enabled = _pModel.IsRedoEnable;
+            toolStripUndoButton.Enabled = _pModel.IsUndoEnable;
         }
 
         private void toolStripStartButton_Click(object sender, EventArgs e)
@@ -168,12 +182,12 @@ namespace DrawingForm
 
         private void toolStripRedoButton_Click(object sender, EventArgs e)
         {
-
+            _model.Redo();
         }
 
         private void toolStripUndoButton_Click(object sender, EventArgs e)
         {
-
+            _model.Undo();
         }
 
         private void TextBoxText_TextChanged(object sender, EventArgs e)

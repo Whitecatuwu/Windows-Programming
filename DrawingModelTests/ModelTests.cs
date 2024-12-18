@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DrawingModel;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using DrawingShape;
 using DrawingShapeTests;
@@ -70,6 +71,12 @@ namespace DrawingModel.Tests
         {
             Model model = new Model();
             model.AddShape(new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" }));
+            Line line = new Line();
+            line.FirstX = 114;
+            line.FirstY = 514;
+            line.SecondX = 191;
+            line.SecondY = 861;
+            model.AddLine(line);
             model.OnPaint(new MockGraphics());
         }
 
@@ -111,8 +118,57 @@ namespace DrawingModel.Tests
             line.SecondY = 861;
             model.AddLine(line);
             PrivateObject privateObject = new PrivateObject(model);
-            List<Line> lines = (List<Line>)privateObject.GetFieldOrProperty("_lines");    
+            List<Line> lines = (List<Line>)privateObject.GetFieldOrProperty("_lines");
             Assert.AreEqual(1, lines.Count());
+        }
+
+        [TestMethod()]
+        public void RemoveShapeTest1()
+        {
+            Model model = new Model();
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() => model.RemoveShape(114514));
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            var shape = new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(shape);
+            model.RemoveShape(shape);
+            Assert.AreEqual(model.RemovedShapeIndex, 1);
+            model.RemoveShape(shape);
+            Assert.AreEqual(model.RemovedShapeIndex, 1);
+        }
+
+        [TestMethod()]
+        public void InsertShapeTest()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+            model.InsertShape(1, ShapeType.START, new string[] { "STARTTest", "2", "1", "100", "100" });
+
+            Assert.AreEqual(4, model.ShapesSize);
+            Assert.AreEqual(model.Shapes[1].Text, "STARTTest");
+
+            Assert.AreEqual(1, model.InsertedShapeIndex);
+        }
+
+        [TestMethod()]
+        public void InsertShapeTest1()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+            var shape = new Start(ShapeType.START, new string[] { "STARTTest", "2", "1", "100", "100" });
+            model.InsertShape(1, shape);
+
+            Assert.AreEqual(4, model.ShapesSize);
+            Assert.AreEqual(model.Shapes[1].Text, "STARTTest");
+        }
+
+        [TestMethod()]
+        public void ExeCommandTest()
+        {
+            Assert.Fail();
         }
     }
 }

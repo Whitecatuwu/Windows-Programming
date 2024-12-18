@@ -64,6 +64,7 @@ namespace DrawingState
             m.AddLine(_hint);
             _selectingCompletedEvent();
         }
+
         public void MouseDoubleClick(Model m, int x, int y)
         {
             //nothing

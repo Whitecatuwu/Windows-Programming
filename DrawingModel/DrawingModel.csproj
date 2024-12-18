@@ -64,6 +64,14 @@
     <Compile Include="..\DrawingShape\Terminator.cs">
       <Link>Shape\Terminator.cs</Link>
     </Compile>
+    <Compile Include="Command\AddShapeCommand.cs" />
+    <Compile Include="Command\CommandManager.cs" />
+    <Compile Include="Command\DeleteShapeCommand.cs" />
+    <Compile Include="Command\DrawCommand.cs" />
+    <Compile Include="Command\ICommand.cs" />
+    <Compile Include="Command\ShapeMoveCommand.cs" />
+    <Compile Include="Command\TextChangeCommand.cs" />
+    <Compile Include="Command\TextMoveCommend.cs" />
     <Compile Include="IGraphics.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

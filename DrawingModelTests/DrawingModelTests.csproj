@@ -58,6 +58,9 @@
     <Compile Include="..\DrawingShapeTests\MockGraphics.cs">
       <Link>MockGraphics.cs</Link>
     </Compile>
+    <Compile Include="Command\AddShapeCommandTests.cs" />
+    <Compile Include="Command\CommandManagerTests.cs" />
+    <Compile Include="Command\DeleteShapeCommandTests.cs" />
     <Compile Include="ModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShapeFactoryTests.cs" />

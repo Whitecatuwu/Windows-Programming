@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DrawingModel;
 using DrawingShape;
@@ -14,6 +15,8 @@ namespace DrawingState
         public event ModelChangedEventHandler _editShapeTextEvent = delegate { };
 
         SortedSet<Shape> _selectedShapes = new SortedSet<Shape>();
+        SortedDictionary<Shape, Tuple<int, int>> _selectedShapesPrePos = new SortedDictionary<Shape, Tuple<int, int>> { }; // {shape:(X,Y)}
+
         const int CTRL_KEY = 17;
         bool _isCtrlKeyDown = false;
         bool _isPressed = false;
@@ -59,18 +62,23 @@ namespace DrawingState
         public void AddSelectedShape(Shape shape)
         {
             _selectedShapes.Add(shape);
+            _selectedShapesPrePos.Add(shape, new Tuple<int,int>(shape.X, shape.Y));
             _selectedShapeEvent();
         }
 
         public void RemoveSelectedShape(Shape shape)
         {
             if (_selectedShapes.Remove(shape))
+            {
                 _selectedShapeEvent();
+                _selectedShapesPrePos.Remove(shape);
+            }     
         }
 
         public void ClearSelectedShapes()
         {
             _selectedShapes.Clear();
+            _selectedShapesPrePos.Clear();
             _selectedShapeEvent();
         }
 
@@ -118,7 +126,7 @@ namespace DrawingState
         {
             foreach (Shape shape in m.Shapes.Reverse())
             {
-                if (shape.IsTouchMovePoint(x,y))
+                if (shape.IsTouchMovePoint(x, y))
                 {
                     _editShapeTextEvent();
                     return;

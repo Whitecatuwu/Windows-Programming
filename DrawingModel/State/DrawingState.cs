@@ -1,5 +1,7 @@
 ﻿using DrawingModel;
 using DrawingShape;
+using DrawingCommand;
+
 using System;
 
 namespace DrawingState
@@ -67,7 +69,8 @@ namespace DrawingState
                 return;
             }
             _hint.Normalize();
-            m.AddShape(_hint);
+            //m.AddShape(_hint);
+            m.ExeCommand(new AddShapeCommand(m,_hint));
             _selectingCompletedEvent();
             _pointerState.AddSelectedShape(_hint);
         }

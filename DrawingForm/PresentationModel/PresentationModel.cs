@@ -2,6 +2,7 @@
 using System.Linq;
 using DrawingModel;
 using DrawingShape;
+using DrawingCommand;
 using System.ComponentModel;
 
 namespace DrawingForm.PresentationModel
@@ -70,6 +71,16 @@ namespace DrawingForm.PresentationModel
         {
             get { return _drawingModeSwitch[5]; }
         }
+
+        public bool IsRedoEnable
+        {
+            get { return _model.IsRedoEnabled; }
+        }
+
+        public bool IsUndoEnable
+        {
+            get { return _model.IsUndoEnabled; }
+        }
         //------------Inputs State------------
 
         public int GetXStateColor
@@ -130,7 +141,7 @@ namespace DrawingForm.PresentationModel
             {
                 _model.EnterPointerState();
             }
-            else if(drawingMode == DrawingMode.LINE)
+            else if (drawingMode == DrawingMode.LINE)
             {
                 _model.EnterLineState();
             }
@@ -158,7 +169,8 @@ namespace DrawingForm.PresentationModel
                 _gotNullShapeTypeEvent();
                 return;
             }
-            _model.AddShape(_praser.ToShapeType(shapeType.ToString()), _inputedDatas);
+            //_model.AddShape(_praser.ToShapeType(shapeType.ToString()), _inputedDatas);
+            _model.ExeCommand(new AddShapeCommand(_model, _praser.ToShapeType(shapeType.ToString()), _inputedDatas));
         }
         private void Notify(string propertyName)
         {

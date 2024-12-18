@@ -1,5 +1,6 @@
 ﻿using DrawingModel;
 using System;
+using System.ComponentModel;
 
 namespace DrawingShape
 {
@@ -30,6 +31,12 @@ namespace DrawingShape
 
             _textBoxMovePoint_X = _textBox_X;
             _textBoxMovePoint_Y = _textBox_Y - _textBox_H / 2;
+
+
+            _connectionPoints[0] = (_x + _width / 2, _y);
+            _connectionPoints[1] = (_x + _width, _y + _height / 2);
+            _connectionPoints[2] = (_x + _width / 2, _y + _height);
+            _connectionPoints[3] = (_x, _y + _height / 2);
         }
 
         protected ShapeType _shapeType;
@@ -46,6 +53,8 @@ namespace DrawingShape
         protected int _textBox_W;
         protected int _textBoxMovePoint_X;
         protected int _textBoxMovePoint_Y;
+
+        protected (int X, int Y)[] _connectionPoints = new (int X, int Y)[4] { (0, 0), (0, 0), (0, 0), (0, 0) }; // up, right, down, left
 
         const int POINT_RADIUS = 10;
 
@@ -132,7 +141,7 @@ namespace DrawingShape
 
         public void DrawText(IGraphics graphics)
         {
-            graphics.DrawText(new int[] { _textBox_X , _textBox_Y , _textBox_H, _textBox_W }, _text);
+            graphics.DrawText(new int[] { _textBox_X, _textBox_Y, _textBox_H, _textBox_W }, _text);
         }
 
         public void Normalize()
@@ -161,7 +170,7 @@ namespace DrawingShape
 
         public void DrawTextBoxFrame(IGraphics graphics)
         {
-            graphics.DrawFrame(new int[] { _textBox_X - _textBox_W / 2, _textBox_Y , _textBox_H, _textBox_W });
+            graphics.DrawFrame(new int[] { _textBox_X - _textBox_W / 2, _textBox_Y, _textBox_H, _textBox_W });
         }
 
         public bool IsTouchMovePoint(int x, int y)

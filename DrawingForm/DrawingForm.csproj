@@ -46,6 +46,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\DrawingModel\Command\AddShapeCommand.cs">
+      <Link>Command\AddShapeCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\Command\CommandManager.cs">
+      <Link>Command\CommandManager.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\Command\DeleteShapeCommand.cs">
+      <Link>Command\DeleteShapeCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\Command\DrawCommand.cs">
+      <Link>Command\DrawCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\Command\ICommand.cs">
+      <Link>Command\ICommand.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\Command\ShapeMoveCommand.cs">
+      <Link>Command\ShapeMoveCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\Command\TextChangeCommand.cs">
+      <Link>Command\TextChangeCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\DrawingModel\Command\TextMoveCommend.cs">
+      <Link>Command\TextMoveCommend.cs</Link>
+    </Compile>
     <Compile Include="..\DrawingModel\IGraphics.cs">
       <Link>Model\IGraphics.cs</Link>
     </Compile>
