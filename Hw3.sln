@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingModelTests", "Drawin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingFormTests", "DrawingFormTests\DrawingFormTests.csproj", "{0ADF35EF-EBB1-4FDC-988D-174591E95B93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingFormUITest", "..\DrawingFormUITest\DrawingFormUITest.csproj", "{08EB8150-AD86-4676-8FDA-6D584F1F234B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,26 @@ Global
 		{0ADF35EF-EBB1-4FDC-988D-174591E95B93}.Release|x64.Build.0 = Release|Any CPU
 		{0ADF35EF-EBB1-4FDC-988D-174591E95B93}.Release|x86.ActiveCfg = Release|Any CPU
 		{0ADF35EF-EBB1-4FDC-988D-174591E95B93}.Release|x86.Build.0 = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|ARM.Build.0 = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|x64.Build.0 = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Debug|x86.Build.0 = Debug|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|ARM.ActiveCfg = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|ARM.Build.0 = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|ARM64.Build.0 = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|x64.ActiveCfg = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|x64.Build.0 = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|x86.ActiveCfg = Release|Any CPU
+		{08EB8150-AD86-4676-8FDA-6D584F1F234B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
