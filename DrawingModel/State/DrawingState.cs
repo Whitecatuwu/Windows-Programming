@@ -45,7 +45,7 @@ namespace DrawingState
         }
 
         public void MouseDown(Model m, int x, int y)
-        {
+        {    
             _isPressed = true;
             _firstX = _lastX = x;
             _firstY = _lastY = y;
@@ -110,10 +110,10 @@ namespace DrawingState
             if (_hint == null)
             {
                 if (_hintShapeType == ShapeType.NULL) return;
-                string[] shapeData = new string[] { new Random().Next().ToString(), x.ToString(), y.ToString(), "1", "1" };
+                string[] shapeData = new string[] { new Random().Next().ToString(), _firstX.ToString(), _firstY.ToString(), "1", "1" };
                 _hint = _shapeFactory.CreateShape(_hintShapeType, shapeData);
-                return;
             }
+         
             _lastX = x;
             _lastY = y;
 

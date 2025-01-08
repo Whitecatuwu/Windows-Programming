@@ -237,5 +237,6 @@ namespace DrawingForm
                 _model.ExeCommand(new TextChangeCommand(_model, textEditForm.GetText()));
             }
         }
+
     }
 }

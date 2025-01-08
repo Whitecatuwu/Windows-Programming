@@ -279,9 +279,9 @@
             // 
             // dataDisplay
             // 
-            this.dataDisplay.Location = new System.Drawing.Point(794, 59);
+            this.dataDisplay.Location = new System.Drawing.Point(784, 54);
             this.dataDisplay.Name = "dataDisplay";
-            this.dataDisplay.Size = new System.Drawing.Size(387, 449);
+            this.dataDisplay.Size = new System.Drawing.Size(409, 590);
             this.dataDisplay.TabIndex = 13;
             this.dataDisplay.TabStop = false;
             this.dataDisplay.Text = "資料顯示";
@@ -432,9 +432,9 @@
             // 
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Controls.Add(this.button2);
-            this.groupBox1.Location = new System.Drawing.Point(0, 57);
+            this.groupBox1.Location = new System.Drawing.Point(0, 53);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(173, 370);
+            this.groupBox1.Size = new System.Drawing.Size(176, 608);
             this.groupBox1.TabIndex = 18;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "頁數列表";
@@ -462,6 +462,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
+            this.Text = "DrawingForm";
             ((System.ComponentModel.ISupportInitialize)(this.shapeGridView)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
