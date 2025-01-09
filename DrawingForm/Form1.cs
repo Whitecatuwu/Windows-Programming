@@ -238,5 +238,10 @@ namespace DrawingForm
             }
         }
 
+        private void toolStripSaveButton_Click(object sender, EventArgs e)
+        {
+            _model.Save();
+            
+        }
     }
 }

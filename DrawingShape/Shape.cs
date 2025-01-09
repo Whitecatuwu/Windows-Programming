@@ -15,10 +15,15 @@ namespace DrawingShape
     }
     abstract public class Shape : IComparable<Shape>
     {
+        /*
+          如果需要生成大量隨機字符串，應避免每次調用時都初始化新的 Random 對象，
+          因為其種子值基於時間，可能會導致生成的字符串重複。可以將 Random 設置為靜態字段
+         */
+        private static readonly Random _random = new Random();
         public Shape(ShapeType shapeType, string[] shapeDatas)
         {
             _shapeType = shapeType;
-            _id = new Random().Next().ToString();
+            _id = _random.Next().ToString();
             _text = shapeDatas[0];
             _x = int.Parse(shapeDatas[1]);
             _y = int.Parse(shapeDatas[2]);
@@ -29,6 +34,14 @@ namespace DrawingShape
             _textBox_Y = _y + _height / 2;
             _textBox_H = 15;
             _textBox_W = 120;
+
+            _connectionPoints = new ConnectionPoint[4]
+            {
+                new ConnectionPoint(this, _x + _width/2, _y, POINT_RADIUS),// up
+                new ConnectionPoint(this, _x + _width, _y + _height/2, POINT_RADIUS), // right
+                new ConnectionPoint(this, _x + _width/2, _y + _height, POINT_RADIUS), // down
+                new ConnectionPoint(this, _x, _y + _height/2, POINT_RADIUS) // left
+            };
             Abjust();
         }
 
@@ -47,14 +60,15 @@ namespace DrawingShape
         protected int _textBoxMovePoint_X;
         protected int _textBoxMovePoint_Y;
 
-        protected int[] _connectionPointXs = new int[4]; // up, right, down, left
-        protected int[] _connectionPointYs = new int[4]; // up, right, down, left
-        protected bool _touched = false;
+        protected bool _touched;
 
-        //protected Line[] _connectedLines = new Line[4];
+        protected ConnectionPoint[] _connectionPoints;// up, right, down, left
 
-        const int POINT_RADIUS = 10;
-
+        const int POINT_RADIUS = 6;
+        public ConnectionPoint[] ConnectionPoints
+        {
+            get { return _connectionPoints; }
+        }
         public ShapeType ShapeType
         {
             get { return _shapeType; }
@@ -73,8 +87,11 @@ namespace DrawingShape
             set
             {
                 TextBox_X += value - _x;
+                foreach (ConnectionPoint connectionPoint in _connectionPoints)
+                {
+                    connectionPoint.X += value - _x;
+                }
                 _x = value;
-                Abjust();
             }
             get { return _x; }
         }
@@ -83,8 +100,11 @@ namespace DrawingShape
             set
             {
                 TextBox_Y += value - _y;
+                foreach (ConnectionPoint connectionPoint in _connectionPoints)
+                {
+                    connectionPoint.Y += value - _y;
+                }
                 _y = value;
-                Abjust();
             }
             get { return _y; }
         }
@@ -93,7 +113,6 @@ namespace DrawingShape
             set
             {
                 _height = value;
-                TextBox_Y = _y + _height / 2;
                 Abjust();
             }
             get { return _height; }
@@ -103,7 +122,6 @@ namespace DrawingShape
             set
             {
                 _width = value;
-                TextBox_X = _x + _width / 2;
                 Abjust();
             }
             get { return _width; }
@@ -193,23 +211,22 @@ namespace DrawingShape
         public void DrawConnectionPoints(IGraphics graphics)
         {
             if (!_touched) return;
-            for (int i = 0; i < 4; i++)
+            foreach (var point in _connectionPoints)
             {
-                graphics.DrawPoint(_connectionPointXs[i], _connectionPointYs[i], POINT_RADIUS);
+                point.Draw(graphics);
             }
         }
-        public int TouchConnectPoint(int x, int y)
+
+        public ConnectionPoint TouchConnectPoint(int x, int y)
         {
-            for (int i = 0; i < 4; i++)
+            foreach (var point in _connectionPoints)
             {
-                ref int cx = ref _connectionPointXs[i];
-                ref int cy = ref _connectionPointYs[i];
-                if ((x - cx) * (x - cx) + (y - cy) * (y - cy) <= POINT_RADIUS * POINT_RADIUS)
+                if (point.IsPointInRange(x, y))
                 {
-                    return i;
+                    return point;
                 }
             }
-            return -1;
+            return null;
         }
 
         /*public void SetConnectLine(in int number,Line)
@@ -219,23 +236,33 @@ namespace DrawingShape
 
         private void Abjust()
         {
-            /*_textBox_X = _x + _width / 2;
+            _textBox_X = _x + _width / 2;
             _textBox_Y = _y + _height / 2;
-            _textBox_H = 15;
+            /*_textBox_H = 15;
             _textBox_W = 120;*/
 
             _textBoxMovePoint_X = _textBox_X;
             _textBoxMovePoint_Y = _textBox_Y - _textBox_H / 2;
 
-            _connectionPointXs[0] = _x + _width / 2 - POINT_RADIUS / 2;
-            _connectionPointXs[1] = _x + _width - POINT_RADIUS / 2;
-            _connectionPointXs[2] = _x + _width / 2 - POINT_RADIUS / 2;
-            _connectionPointXs[3] = _x - POINT_RADIUS / 2;
-
-            _connectionPointYs[0] = _y - POINT_RADIUS / 2;
-            _connectionPointYs[1] = _y + _height / 2 - POINT_RADIUS / 2;
-            _connectionPointYs[2] = _y + _height - POINT_RADIUS / 2;
-            _connectionPointYs[3] = _y + _height / 2 - POINT_RADIUS / 2;
+            int[] x = new int[4]
+            {
+                _x + _width/2,
+                _x + _width,
+                _x + _width/2,
+                _x
+            };
+            int[] y = new int[4]
+            {
+                _y,
+                _y + _height/2,
+                _y + _height,
+                _y + _height/2
+            };
+            for (int i = 0; i < _connectionPoints.Length; i++)
+            {
+                _connectionPoints[i].X = x[i];
+                _connectionPoints[i].Y = y[i];
+            }
         }
     }
 }

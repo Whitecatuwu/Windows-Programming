@@ -44,6 +44,7 @@
     <Compile Include="..\DrawingModel\IGraphics.cs">
       <Link>IGraphics.cs</Link>
     </Compile>
+    <Compile Include="ConnectionPoint.cs" />
     <Compile Include="Decision.cs" />
     <Compile Include="IDrawable.cs" />
     <Compile Include="Line.cs" />

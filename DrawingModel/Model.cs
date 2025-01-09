@@ -3,6 +3,8 @@ using System.Linq;
 using DrawingShape;
 using DrawingState;
 using DrawingCommand;
+using System.Runtime.InteropServices.ComTypes;
+using System;
 
 
 namespace DrawingModel
@@ -157,11 +159,15 @@ namespace DrawingModel
                 shape.DrawText(g);
                 shape.DrawTextBoxFrame(g);
                 shape.DrawTextBoxMovePoint(g);
+                foreach (var point in shape.ConnectionPoints)
+                {
+                    point.DrawLines(_shapes, g);
+                }
             }
-            foreach (Line line in _lines)
+            /*foreach (Line line in _lines)
             {
                 ((IDrawable)line).Draw(g);
-            }
+            }*/
             _currentState.OnPaint(this, g);
         }
 
@@ -230,16 +236,17 @@ namespace DrawingModel
             _movedShapesEvent();
         }
 
-        public void AddLine(in Line line)
+        public void AddLine(in ConnectionPoint first, in ConnectionPoint second, in Line line)
         {
-            _lines.Add(line);
+            line.ConnectedFirstPoint = first;
+            line.ConnectedSecondPoint = second;
             _addedLineEvent();
         }
 
         public void RemoveLine(in Line line)
         {
-            if (_lines.Remove(line))
-                _removedLineEvent();
+            line.Disconnect();
+            _removedLineEvent();
         }
 
         public void EditShapeText(in string text)
@@ -266,6 +273,33 @@ namespace DrawingModel
         {
             _commandManager.Undo();
             _commandExecutedEvent();
+        }
+
+        public void Save()
+        {
+            foreach (var shape in _shapes)
+            {
+                Console.WriteLine
+                    ($"id:{shape.Id}, text:{shape.Text}, x:{shape.X}, y:{shape.Y}, h:{shape.Height}, w:{shape.Width}");
+                foreach (var point in shape.ConnectionPoints)
+                {
+                    foreach (var line in point.ConnectedLines)
+                    {
+                        if (_shapes.IndexOf(line.ConnectedShape(point)) == -1) continue;
+                        if (line.ConnectedShape(point).Id == shape.Id)
+                        {
+                            Console.WriteLine
+                                ($"point:{line.ConnectedShape(point).Id}");
+                        }
+                        else
+                        {
+                            Console.WriteLine
+                                ($"point:{line.ConnectedShape(point).Id}");
+                        }
+
+                    }
+                }
+            }
         }
     }
 }

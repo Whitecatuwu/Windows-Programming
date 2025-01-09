@@ -8,12 +8,14 @@ namespace DrawingShape
         int _firstY = 0;
         int _secondX = 0;
         int _secondY = 0;
+        //bool _isConnected = false;
 
-        Shape _connectedFirstShape = null;
-        int _connectedFirstShapePointNumber = -1;
-        Shape _connectedSecondShape = null;
-        int _connectedSecondShapePointNumber = -1;
-
+        ConnectionPoint _connectedFirstPoint = null;
+        ConnectionPoint _connectedSecondPoint = null;
+        /*public bool IsConnected
+        {
+            get { return _connectedFirstPoint != null && _connectedSecondPoint != null; }
+        }*/
         public int FirstX
         {
             set { _firstX = value; }
@@ -34,30 +36,60 @@ namespace DrawingShape
             set { _secondY = value; }
             get { return _secondY; }
         }
-        public Shape ConnectedFirstShape
+        public ConnectionPoint ConnectedFirstPoint
         {
-            set { _connectedFirstShape = value; }
-            get { return _connectedFirstShape; }
+            set
+            {
+                _connectedFirstPoint = value;
+                _connectedFirstPoint._pointChangeEvent += delegate
+                {
+                    FirstX = _connectedFirstPoint.X;
+                    FirstY = _connectedFirstPoint.Y;
+                };
+                _connectedFirstPoint._pointRemovedEvent += delegate
+                {
+                    _connectedSecondPoint?.RemoveConnectionLine(this);
+                };
+                value.AddConnectionLine(this);
+            }
+            get { return _connectedFirstPoint; }
         }
 
-        public Shape ConnectedSecondShape
+        public ConnectionPoint ConnectedSecondPoint
         {
-            set { _connectedSecondShape = value; }
-            get { return _connectedSecondShape; }
-        }
-        public int ConnectedFirstShapePointNumber
-        {
-            set { _connectedFirstShapePointNumber = value; }
-            get { return _connectedFirstShapePointNumber; }
-        }
-        public int ConnectedSecondShapePointNumber
-        {
-            set { _connectedSecondShapePointNumber = value; }
-            get { return _connectedSecondShapePointNumber; }
+            set
+            {
+                _connectedSecondPoint = value;
+                _connectedSecondPoint._pointChangeEvent += delegate
+                {
+                    SecondX = _connectedSecondPoint.X;
+                    SecondY = _connectedSecondPoint.Y;
+                };
+                _connectedSecondPoint._pointRemovedEvent += delegate
+                {
+                    _connectedFirstPoint?.RemoveConnectionLine(this);
+                };
+                value.AddConnectionLine(this);
+            }
+            get { return _connectedSecondPoint; }
         }
 
+        public void Disconnect()
+        {
+            _connectedFirstPoint.RemoveConnectionLine(this);
+            _connectedFirstPoint = null;
+            _connectedSecondPoint.RemoveConnectionLine(this);
+            _connectedSecondPoint = null;
+        }
 
-        public Line() { }
+        public Shape ConnectedShape(ConnectionPoint point)
+        {
+            var anotherPoint = 
+                (_connectedFirstPoint.CompareTo(point) == 0) ? _connectedSecondPoint : _connectedFirstPoint;
+            return anotherPoint.ParantShape;
+        }
+
+        //public Line() { }
         public void Draw(DrawingModel.IGraphics graphics)
         {
             graphics.DrawLine(_firstX, _firstY, _secondX, _secondY);
@@ -66,6 +98,5 @@ namespace DrawingShape
         {
             return false;
         }
-
     }
 }

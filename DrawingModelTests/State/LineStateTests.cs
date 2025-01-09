@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DrawingModel;
 using DrawingShapeTests;
+using DrawingShape;
 
 namespace DrawingState.Tests
 {
@@ -114,6 +115,31 @@ namespace DrawingState.Tests
             LineState lineState = new LineState();
             lineState.Initialize(m);
             lineState.KeyUp(m, 0);
+        }
+
+        [TestMethod()]
+        public void DisplayTouchedShapeTest()
+        {
+            LineState lineState = new LineState();
+            Model model = new Model();
+            lineState.Initialize(model);
+            var shape = new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(shape);
+
+            PrivateObject privateObject = new PrivateObject(lineState);
+            Shape touchedShape = null;
+
+            privateObject.Invoke("DisplayTouchedShape", model, 70, 70); //touched
+            touchedShape = (Shape)privateObject.GetFieldOrProperty("_touchedShape");
+            Assert.IsNotNull(touchedShape);
+
+            privateObject.Invoke("DisplayTouchedShape", model, 60, 60); //touched
+            touchedShape = (Shape)privateObject.GetFieldOrProperty("_touchedShape");
+            Assert.IsNotNull(touchedShape);
+
+            privateObject.Invoke("DisplayTouchedShape", model, 200, 200);//untouched
+            touchedShape = (Shape)privateObject.GetFieldOrProperty("_touchedShape");
+            Assert.IsNull(touchedShape);
         }
     }
 }

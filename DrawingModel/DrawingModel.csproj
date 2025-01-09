@@ -43,6 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\DrawingShape\ConnectionPoint.cs">
+      <Link>Shape\ConnectionPoint.cs</Link>
+    </Compile>
     <Compile Include="..\DrawingShape\Decision.cs">
       <Link>Shape\Decision.cs</Link>
     </Compile>

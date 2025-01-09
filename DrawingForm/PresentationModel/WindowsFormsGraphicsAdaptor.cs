@@ -93,7 +93,7 @@ namespace DrawingForm.PresentationModel
         }
         public void DrawPoint(in int x, in int y, in int r)
         {
-            _graphics.FillEllipse(Brushes.Orange, x, y, r, r);
+            _graphics.FillEllipse(Brushes.Orange, x - r, y - r, r*2, r*2);
         }
 
         public void DrawLine(in int x1, in int y1, in int x2, in int y2)

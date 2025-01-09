@@ -66,6 +66,7 @@
             this.toolStripRedoButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripUndoButton = new System.Windows.Forms.ToolStripButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.toolStripSaveButton = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.shapeGridView)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -322,7 +323,7 @@
             // 關於ToolStripMenuItem
             // 
             this.關於ToolStripMenuItem.Name = "關於ToolStripMenuItem";
-            this.關於ToolStripMenuItem.Size = new System.Drawing.Size(122, 26);
+            this.關於ToolStripMenuItem.Size = new System.Drawing.Size(223, 26);
             this.關於ToolStripMenuItem.Text = "關於";
             // 
             // toolStrip1
@@ -336,7 +337,8 @@
             this.toolStripLineButton,
             this.toolStripSelectButton,
             this.toolStripRedoButton,
-            this.toolStripUndoButton});
+            this.toolStripUndoButton,
+            this.toolStripSaveButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 27);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1193, 27);
@@ -435,6 +437,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "頁數列表";
             // 
+            // toolStripSaveButton
+            // 
+            this.toolStripSaveButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripSaveButton.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSaveButton.Image")));
+            this.toolStripSaveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSaveButton.Name = "toolStripSaveButton";
+            this.toolStripSaveButton.Size = new System.Drawing.Size(29, 24);
+            this.toolStripSaveButton.Text = "Save";
+            this.toolStripSaveButton.Click += new System.EventHandler(this.toolStripSaveButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -508,6 +520,7 @@
         private System.Windows.Forms.ToolStripButton toolStripLineButton;
         public System.Windows.Forms.DataGridView shapeGridView;
         public System.Windows.Forms.GroupBox dataDisplay;
+        private System.Windows.Forms.ToolStripButton toolStripSaveButton;
     }
 }
 

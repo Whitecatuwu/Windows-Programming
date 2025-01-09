@@ -128,6 +128,9 @@
     <Compile Include="..\DrawingModel\ShapeModel.cs">
       <Link>Model\ShapeModel.cs</Link>
     </Compile>
+    <Compile Include="..\DrawingShape\ConnectionPoint.cs">
+      <Link>Shapes\ConnectionPoint.cs</Link>
+    </Compile>
     <Compile Include="..\DrawingShape\Decision.cs">
       <Link>Shapes\Decision.cs</Link>
     </Compile>

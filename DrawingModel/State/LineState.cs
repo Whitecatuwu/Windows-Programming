@@ -48,22 +48,7 @@ namespace DrawingState
         }
         public void MouseMove(Model m, int x, int y)
         {
-            foreach (Shape shape in m.Shapes.Reverse())
-            {
-                if (((IDrawable)shape).IsPointInRange(x, y))
-                {
-                    _touchedShape = shape;
-                    _touchedShape.Touched = true;
-                    _touchShapeEvent();
-                    break;
-                }
-                if (_touchedShape != null)
-                {
-                    _touchedShape.Touched = false;
-                    _touchedShape = null;
-                    _touchShapeEvent();
-                }
-            }
+            DisplayTouchedShape(m, x, y);
 
             if (!_isPressed) return;
             if (_secondX == x && _secondY == y) return;
@@ -71,16 +56,14 @@ namespace DrawingState
             {
                 foreach (Shape shape in m.Shapes.Reverse())
                 {
-                    int num = shape.TouchConnectPoint(x, y);
-                    if (num != -1)
-                    {
-                        _hint = new Line();
-                        _hint.FirstX = _firstX;
-                        _hint.FirstY = _firstY;
-                        _hint.ConnectedFirstShape = shape;
-                        _hint.ConnectedFirstShapePointNumber = num;
-                        return;
-                    }
+                    var point = shape.TouchConnectPoint(x, y);
+                    if (point == null) continue;
+
+                    _hint = new Line();
+                    _hint.FirstX = _firstX;
+                    _hint.FirstY = _firstY;
+                    _hint.ConnectedFirstPoint = point;
+                    return;
                 }
                 return;
             }
@@ -98,22 +81,23 @@ namespace DrawingState
                 _selectingFailedEvent();
                 return;
             }
+
             foreach (Shape shape in m.Shapes.Reverse())
             {
-                int num = shape.TouchConnectPoint(x, y);
-                if (num != -1)
+                var point = shape.TouchConnectPoint(x, y);
+                if (point == null) continue;
+                if (_hint.ConnectedFirstPoint.CompareTo(point) == 0)
                 {
-                    if (_hint.ConnectedFirstShape.CompareTo(shape) == 0 && _hint.ConnectedFirstShapePointNumber == num)
-                    {
-                        return;
-                    }
-                    _hint.ConnectedSecondShape = shape;
-                    _hint.ConnectedSecondShapePointNumber = num;
-                    //m.AddLine(_hint);
-                    m.ExeCommand(new AddLineCommand(m, _hint));
-                    _selectingCompletedEvent();
-                }
+                    break;
+                };
+
+                m.ExeCommand(new AddLineCommand(m, _hint.ConnectedFirstPoint, point, _hint));
+                //_hint.ConnectedSecondPoint = point;
+                _hint = null;
+                _selectingCompletedEvent();
+                return;
             }
+            _hint.ConnectedFirstPoint.RemoveConnectionLine(_hint);
             _hint = null;
             _selectingFailedEvent();
         }
@@ -129,6 +113,26 @@ namespace DrawingState
         public void KeyUp(Model m, int keyValue)
         {
             //nothing
+        }
+
+        private void DisplayTouchedShape(Model m, int x, int y)
+        {
+            foreach (Shape shape in m.Shapes.Reverse())
+            {
+                if (((IDrawable)shape).IsPointInRange(x, y))
+                {
+                    _touchedShape = shape;
+                    _touchedShape.Touched = true;
+                    _touchShapeEvent();
+                    break;
+                }
+                if (_touchedShape != null)
+                {
+                    _touchedShape.Touched = false;
+                    _touchedShape = null;
+                    _touchShapeEvent();
+                }
+            }
         }
     }
 }

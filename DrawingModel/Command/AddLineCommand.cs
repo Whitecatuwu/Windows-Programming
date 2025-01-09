@@ -1,21 +1,27 @@
 ﻿using DrawingShape;
 using DrawingModel;
+using System.Runtime.InteropServices;
 
 namespace DrawingCommand
 {
     public class AddLineCommand : ICommand
     {
-        Model _model;
+        ConnectionPoint _first;
+        ConnectionPoint _second;
         Line _line;
-        public AddLineCommand(in Model model, in Line line)
+        Model _model;
+
+        public AddLineCommand(Model model, ConnectionPoint first, ConnectionPoint second, in Line line)
         {
             _model = model;
+            _first = first;
+            _second = second;
             _line = line;
         }
 
         public void Execute()
         {
-            _model.AddLine(_line);
+            _model.AddLine(_first, _second, _line);
         }
 
         public void UnExecute()
