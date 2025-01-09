@@ -74,8 +74,11 @@
             // 
             // shapeGridView
             // 
+            this.shapeGridView.AccessibleName = "shapeGridView";
             this.shapeGridView.AllowUserToAddRows = false;
             this.shapeGridView.AllowUserToDeleteRows = false;
+            this.shapeGridView.AllowUserToResizeColumns = false;
+            this.shapeGridView.AllowUserToResizeRows = false;
             this.shapeGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.shapeGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.刪除,
@@ -86,6 +89,7 @@
             this.Y,
             this.H,
             this.W});
+            this.shapeGridView.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.shapeGridView.Location = new System.Drawing.Point(807, 138);
             this.shapeGridView.Name = "shapeGridView";
             this.shapeGridView.RowHeadersWidth = 51;
@@ -99,7 +103,6 @@
             this.刪除.HeaderText = "刪除";
             this.刪除.MinimumWidth = 6;
             this.刪除.Name = "刪除";
-            this.刪除.ReadOnly = true;
             this.刪除.Width = 48;
             // 
             // ID
@@ -107,7 +110,6 @@
             this.ID.HeaderText = "ID";
             this.ID.MinimumWidth = 6;
             this.ID.Name = "ID";
-            this.ID.ReadOnly = true;
             this.ID.Width = 32;
             // 
             // 形狀
@@ -115,7 +117,6 @@
             this.形狀.HeaderText = "形狀";
             this.形狀.MinimumWidth = 6;
             this.形狀.Name = "形狀";
-            this.形狀.ReadOnly = true;
             this.形狀.Width = 48;
             // 
             // 文字
@@ -123,7 +124,6 @@
             this.文字.HeaderText = "文字";
             this.文字.MinimumWidth = 6;
             this.文字.Name = "文字";
-            this.文字.ReadOnly = true;
             this.文字.Width = 48;
             // 
             // X
@@ -131,7 +131,6 @@
             this.X.HeaderText = "X";
             this.X.MinimumWidth = 6;
             this.X.Name = "X";
-            this.X.ReadOnly = true;
             this.X.Width = 32;
             // 
             // Y
@@ -139,7 +138,6 @@
             this.Y.HeaderText = "Y";
             this.Y.MinimumWidth = 6;
             this.Y.Name = "Y";
-            this.Y.ReadOnly = true;
             this.Y.Width = 32;
             // 
             // H
@@ -147,7 +145,6 @@
             this.H.HeaderText = "H";
             this.H.MinimumWidth = 6;
             this.H.Name = "H";
-            this.H.ReadOnly = true;
             this.H.Width = 32;
             // 
             // W
@@ -155,7 +152,6 @@
             this.W.HeaderText = "W";
             this.W.MinimumWidth = 6;
             this.W.Name = "W";
-            this.W.ReadOnly = true;
             this.W.Width = 32;
             // 
             // selectedShapeType
@@ -475,8 +471,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.DataGridView shapeGridView;
         private System.Windows.Forms.ComboBox selectedShapeType;
         private System.Windows.Forms.TextBox TextBoxText;
         private System.Windows.Forms.TextBox TextBoxX;
@@ -497,7 +491,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn H;
         private System.Windows.Forms.DataGridViewTextBoxColumn W;
         private System.Windows.Forms.Button ShapeAddButton;
-        private System.Windows.Forms.GroupBox dataDisplay;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.MenuStrip menuStrip1;
@@ -513,6 +506,8 @@
         private System.Windows.Forms.ToolStripButton toolStripUndoButton;
         private System.Windows.Forms.ToolStripButton toolStripRedoButton;
         private System.Windows.Forms.ToolStripButton toolStripLineButton;
+        public System.Windows.Forms.DataGridView shapeGridView;
+        public System.Windows.Forms.GroupBox dataDisplay;
     }
 }
 

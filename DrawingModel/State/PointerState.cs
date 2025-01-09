@@ -77,8 +77,8 @@ namespace DrawingState
         {
             if (_selectedShapes.Remove(shape))
             {
-                _selectedShapeEvent();
                 _selectedShapesPrePositions.Remove(shape);
+                _selectedShapeEvent();
             }
         }
 
@@ -120,37 +120,30 @@ namespace DrawingState
         {
             if (!_isPressed) return;
             _isPressed = false;
+            if(!_isMoved) return;
 
-            if (_touchedTextBoxShape != null && _isMoved)
+            if (_touchedTextBoxShape != null)
             {
-                _isMoved = false;
                 m.ExeCommand(new TextMoveCommend(m, _touchedTextBoxShape, _touchedTextBoxShapePos));
                 _touchedTextBoxShape = null;
-                return;
             }
 
-            if (_selectedShapes.Count() <= 0) return;
-            if (!_isMoved) return;
-            m.ExeCommand(new ShapeMoveCommand(m, _selectedShapes, _selectedShapesPrePositions));
-            _isMoved = false;
-
-            /*foreach (Shape selectedShape in _selectedShapes)
+            else if (_selectedShapes.Count() >= 0)
             {
-                m.UpdatedShapeIndex = m.Shapes.IndexOf(selectedShape);
-                _movedShapesEvent();
-            }*/
+                m.ExeCommand(new ShapeMoveCommand(m, _selectedShapesPrePositions));
+            }
+            
+            _isMoved = false;
         }
 
         public void MouseDoubleClick(Model m, int x, int y)
         {
             foreach (Shape shape in m.Shapes.Reverse())
             {
-                if (shape.IsTouchMovePoint(x, y))
-                {
-                    m.TextEditShapeIndex = m.Shapes.IndexOf(shape);
-                    _editShapeTextEvent();
-                    return;
-                }
+                if (!shape.IsTouchMovePoint(x, y)) continue; 
+                m.TextEditShapeIndex = m.Shapes.IndexOf(shape);
+                _editShapeTextEvent();
+                return;
             }
         }
 

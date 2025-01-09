@@ -12,7 +12,7 @@ namespace DrawingCommand.Tests
         [TestMethod()]
         public void ShapeMoveCommandTest()
         {
-            var move = new ShapeMoveCommand(new DrawingModel.Model(), new SortedSet<Shape> { }, new SortedDictionary<Shape, Tuple<int, int>> { });
+            var move = new ShapeMoveCommand(new DrawingModel.Model(), new SortedDictionary<Shape, Tuple<int, int>> { });
         }
 
         [TestMethod()]
@@ -27,7 +27,7 @@ namespace DrawingCommand.Tests
             shapes.Add(shape);
             pos.Add(shape, new Tuple<int, int>(114, 514));
 
-            var move = new ShapeMoveCommand(model, shapes, pos);
+            var move = new ShapeMoveCommand(model, pos);
             move.UnExecute();
             Assert.AreEqual(shape.X, 114);
             Assert.AreEqual(shape.Y, 514);
@@ -48,7 +48,7 @@ namespace DrawingCommand.Tests
             shapes.Add(shape);
             pos.Add(shape, new Tuple<int, int>(114, 514));
 
-            var move = new ShapeMoveCommand(model, shapes, pos);
+            var move = new ShapeMoveCommand(model, pos);
             move.UnExecute();
             Assert.AreEqual(shape.X, 114);
             Assert.AreEqual(shape.Y, 514);

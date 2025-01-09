@@ -8,16 +8,20 @@ namespace DrawingCommand
     public class ShapeMoveCommand : ICommand
     {
         Model _model;
-        SortedSet<Shape> _shapes;
         SortedDictionary<Shape, Tuple<int, int>> _prePositions;
-        SortedDictionary<Shape, Tuple<int, int>> _newPositions = new SortedDictionary<Shape, Tuple<int, int>> { };
+        SortedDictionary<Shape, Tuple<int, int>> _newPositions;
 
-        public ShapeMoveCommand(Model model, SortedSet<Shape> shapes, SortedDictionary<Shape, Tuple<int, int>> prePositions)
+        public ShapeMoveCommand(Model model, SortedDictionary<Shape, Tuple<int, int>> prePositions)
         {
             _model = model;
-            _shapes = shapes;
-            _prePositions = prePositions;
-            foreach (var shape in shapes)
+            _prePositions = new SortedDictionary<Shape, Tuple<int, int>> { };
+            _newPositions = new SortedDictionary<Shape, Tuple<int, int>> { };
+            foreach (var shape in prePositions.Keys)
+            {
+                var pos = prePositions[shape];
+                _prePositions.Add(shape, new Tuple<int, int>(pos.Item1, pos.Item2));
+            }
+            foreach (var shape in _prePositions.Keys)
             {
                 _newPositions.Add(shape, new Tuple<int, int>(shape.X, shape.Y));
             }
