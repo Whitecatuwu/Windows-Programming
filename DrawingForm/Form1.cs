@@ -164,6 +164,7 @@ namespace DrawingForm
         {
             _pModel.SetDrawingMode(DrawingMode.START);
         }
+        
 
         private void toolStripTerminatorButton_Click(object sender, EventArgs e)
         {

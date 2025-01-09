@@ -1,7 +1,10 @@
 ﻿using DrawingCommand;
 using DrawingModel;
 using DrawingShape;
+using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace DrawingState
 {
@@ -62,8 +65,9 @@ namespace DrawingState
                     _hint = new Line();
                     _hint.FirstX = _firstX;
                     _hint.FirstY = _firstY;
+                    _hint.SecondX = _secondX;
+                    _hint.SecondY = _secondY;
                     _hint.ConnectedFirstPoint = point;
-                    return;
                 }
                 return;
             }
@@ -77,26 +81,25 @@ namespace DrawingState
             _isPressed = false;
 
             if (_hint == null || (_hint.FirstX == _hint.SecondX && _hint.FirstY == _hint.SecondY))
-            {
+            {           
                 _selectingFailedEvent();
                 return;
             }
-
             foreach (Shape shape in m.Shapes.Reverse())
             {
                 var point = shape.TouchConnectPoint(x, y);
+                
                 if (point == null) continue;
                 if (_hint.ConnectedFirstPoint.CompareTo(point) == 0)
                 {
-                    break;
+                    continue;
                 };
-
+                
                 m.ExeCommand(new AddLineCommand(m, _hint.ConnectedFirstPoint, point, _hint));
-                //_hint.ConnectedSecondPoint = point;
-                _hint = null;
                 _selectingCompletedEvent();
+                _hint = null;
                 return;
-            }
+            }           
             _hint.ConnectedFirstPoint.RemoveConnectionLine(_hint);
             _hint = null;
             _selectingFailedEvent();

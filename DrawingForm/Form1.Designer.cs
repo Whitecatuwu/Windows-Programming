@@ -65,8 +65,8 @@
             this.toolStripSelectButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripRedoButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripUndoButton = new System.Windows.Forms.ToolStripButton();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.toolStripSaveButton = new System.Windows.Forms.ToolStripButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.shapeGridView)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -323,7 +323,7 @@
             // 關於ToolStripMenuItem
             // 
             this.關於ToolStripMenuItem.Name = "關於ToolStripMenuItem";
-            this.關於ToolStripMenuItem.Size = new System.Drawing.Size(223, 26);
+            this.關於ToolStripMenuItem.Size = new System.Drawing.Size(122, 26);
             this.關於ToolStripMenuItem.Text = "關於";
             // 
             // toolStrip1
@@ -426,6 +426,16 @@
             this.toolStripUndoButton.Text = "Undo";
             this.toolStripUndoButton.Click += new System.EventHandler(this.toolStripUndoButton_Click);
             // 
+            // toolStripSaveButton
+            // 
+            this.toolStripSaveButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripSaveButton.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSaveButton.Image")));
+            this.toolStripSaveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSaveButton.Name = "toolStripSaveButton";
+            this.toolStripSaveButton.Size = new System.Drawing.Size(29, 24);
+            this.toolStripSaveButton.Text = "Save";
+            this.toolStripSaveButton.Click += new System.EventHandler(this.toolStripSaveButton_Click);
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.button1);
@@ -436,16 +446,6 @@
             this.groupBox1.TabIndex = 18;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "頁數列表";
-            // 
-            // toolStripSaveButton
-            // 
-            this.toolStripSaveButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripSaveButton.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSaveButton.Image")));
-            this.toolStripSaveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripSaveButton.Name = "toolStripSaveButton";
-            this.toolStripSaveButton.Size = new System.Drawing.Size(29, 24);
-            this.toolStripSaveButton.Text = "Save";
-            this.toolStripSaveButton.Click += new System.EventHandler(this.toolStripSaveButton_Click);
             // 
             // Form1
             // 
