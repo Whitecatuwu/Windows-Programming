@@ -81,6 +81,10 @@ namespace DrawingForm.PresentationModel
         {
             get { return _model.IsUndoEnabled; }
         }
+        public bool IsSaveEnable
+        {
+            get { return _model.IsSaveEnabled; }
+        }
         //------------Inputs State------------
 
         public int GetXStateColor

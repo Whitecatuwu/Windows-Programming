@@ -82,12 +82,16 @@ namespace DrawingShape
             _connectedSecondPoint = null;
         }
 
-        public Shape ConnectedShape(ConnectionPoint point)
+        public ConnectionPoint AnotherPoint(ConnectionPoint point)
         {
-            var anotherPoint = 
+            var anotherPoint =
                 (_connectedFirstPoint.CompareTo(point) == 0) ? _connectedSecondPoint : _connectedFirstPoint;
-            return anotherPoint.ParantShape;
+            return anotherPoint;
         }
+        /*public Shape ConnectedShape(ConnectionPoint point)
+        {
+            return AnotherPoint(point).ParantShape;
+        }*/
 
         //public Line() { }
         public void Draw(DrawingModel.IGraphics graphics)

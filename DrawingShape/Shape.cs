@@ -37,10 +37,10 @@ namespace DrawingShape
 
             _connectionPoints = new ConnectionPoint[4]
             {
-                new ConnectionPoint(this, _x + _width/2, _y, POINT_RADIUS),// up
-                new ConnectionPoint(this, _x + _width, _y + _height/2, POINT_RADIUS), // right
-                new ConnectionPoint(this, _x + _width/2, _y + _height, POINT_RADIUS), // down
-                new ConnectionPoint(this, _x, _y + _height/2, POINT_RADIUS) // left
+                new ConnectionPoint(this, new int[] {_x + _width/2, _y, POINT_RADIUS, 0}),// up
+                new ConnectionPoint(this, new int[] {_x + _width, _y + _height/2, POINT_RADIUS, 1}), // right
+                new ConnectionPoint(this, new int[] {_x + _width/2, _y + _height, POINT_RADIUS, 2}), // down
+                new ConnectionPoint(this, new int[] {_x, _y + _height/2, POINT_RADIUS, 3}) // left
             };
             Abjust();
         }

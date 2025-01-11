@@ -67,6 +67,7 @@
             this.toolStripUndoButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSaveButton = new System.Windows.Forms.ToolStripButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.toolStripLoadButton = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.shapeGridView)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -338,7 +339,8 @@
             this.toolStripSelectButton,
             this.toolStripRedoButton,
             this.toolStripUndoButton,
-            this.toolStripSaveButton});
+            this.toolStripSaveButton,
+            this.toolStripLoadButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 27);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1193, 27);
@@ -447,6 +449,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "頁數列表";
             // 
+            // toolStripLoadButton
+            // 
+            this.toolStripLoadButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripLoadButton.Image = ((System.Drawing.Image)(resources.GetObject("toolStripLoadButton.Image")));
+            this.toolStripLoadButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripLoadButton.Name = "toolStripLoadButton";
+            this.toolStripLoadButton.Size = new System.Drawing.Size(29, 24);
+            this.toolStripLoadButton.Text = "Load";
+            this.toolStripLoadButton.Click += new System.EventHandler(this.toolStripLoadButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -521,6 +533,7 @@
         public System.Windows.Forms.DataGridView shapeGridView;
         public System.Windows.Forms.GroupBox dataDisplay;
         private System.Windows.Forms.ToolStripButton toolStripSaveButton;
+        private System.Windows.Forms.ToolStripButton toolStripLoadButton;
     }
 }
 

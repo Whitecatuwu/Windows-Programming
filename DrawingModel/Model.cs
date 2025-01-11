@@ -5,6 +5,9 @@ using DrawingState;
 using DrawingCommand;
 using System.Runtime.InteropServices.ComTypes;
 using System;
+using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 
 
 namespace DrawingModel
@@ -29,6 +32,8 @@ namespace DrawingModel
         public event ModelChangedEventHandler _addedLineEvent = delegate { };
         public event ModelChangedEventHandler _removedLineEvent = delegate { };
         public event ModelChangedEventHandler _touchedShapeEvent = delegate { };
+        public event ModelChangedEventHandler _saveEvent = delegate { };
+        public event ModelChangedEventHandler _saveFailedEvent = delegate { };
 
         ShapeFactory _shapeFactory = new ShapeFactory();
         CommandManager _commandManager = new CommandManager();
@@ -45,6 +50,8 @@ namespace DrawingModel
         int _updatedShapeIndex = -1;
         int _insertedShapeIndex = -1;
         int _textEditShapeIndex = -1;
+
+        bool _saving = false;
 
         public Model()
         {
@@ -109,6 +116,11 @@ namespace DrawingModel
         public bool IsUndoEnabled
         {
             get { return _commandManager.IsUndoEnabled; }
+        }
+
+        public bool IsSaveEnabled
+        {
+            get { return !_saving; }
         }
 
         public void EnterPointerState()
@@ -275,31 +287,77 @@ namespace DrawingModel
             _commandExecutedEvent();
         }
 
-        public void Save()
+        async public void Save(string path)
         {
+            this._saving = true;
+            _saveEvent();
+
+            Task<bool> task = Task.Run(() =>
+            {
+                try
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(3));
+                    File.WriteAllText(path, GetContent());
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            });
+            bool saveSuccess = await task;
+            this._saving = false;
+
+            if (saveSuccess)
+            {
+                _saveEvent();
+            }
+            else
+            {
+                _saveFailedEvent();
+            }
+        }
+
+        public void AutoSave()
+        {
+            string solutionPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\"));
+            var time = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var targetFolderPath = Path.Combine(solutionPath, "DrawingForm", "bin", "Debug", "drawing_backup");
+            if (!Directory.Exists(targetFolderPath))
+            {
+                Directory.CreateDirectory(targetFolderPath);
+            }
+            var targetPath = Path.Combine(targetFolderPath, $"{time}_bak.mydrawing");
+        }
+
+        public void Load(string path)
+        {
+
+        }
+
+        private string GetContent()
+        {
+            string content = "";
             foreach (var shape in _shapes)
             {
-                Console.WriteLine
-                    ($"id:{shape.Id}, text:{shape.Text}, x:{shape.X}, y:{shape.Y}, h:{shape.Height}, w:{shape.Width}");
+                content += $"{shape.Id}, {shape.Text}, {shape.X}, {shape.Y}, {shape.Height}, {shape.Width}";
                 foreach (var point in shape.ConnectionPoints)
                 {
+                    string connectedShapeIds = "";
                     foreach (var line in point.ConnectedLines)
                     {
-                        if (_shapes.IndexOf(line.ConnectedShape(point)) == -1) continue;
-                        if (line.ConnectedShape(point).Id == shape.Id)
-                        {
-                            Console.WriteLine
-                                ($"point:{line.ConnectedShape(point).Id}");
-                        }
-                        else
-                        {
-                            Console.WriteLine
-                                ($"point:{line.ConnectedShape(point).Id}");
-                        }
+                        var anotherPoint = line.AnotherPoint(point);
+                        var connectedShape = anotherPoint.ParantShape;
+                        if (_shapes.IndexOf(connectedShape) == -1) continue;
+                        if (connectedShape.Id == shape.Id) continue;
 
+                        connectedShapeIds += $"{connectedShape.Id}_{anotherPoint.Seq}, ";
                     }
+                    content += $", [{connectedShapeIds}]";
                 }
+                content += "\n";
             }
+            return content;
         }
     }
 }

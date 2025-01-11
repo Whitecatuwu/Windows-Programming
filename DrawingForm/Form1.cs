@@ -6,7 +6,7 @@ using DrawingModel;
 using DrawingForm.PresentationModel;
 using DrawingCommand;
 using Hw2;
-using System.Runtime.InteropServices;
+using System.Timers;
 
 namespace DrawingForm
 {
@@ -17,10 +17,16 @@ namespace DrawingForm
         Panel _canvas = new DoubleBufferedPanel();
         Model _model = new Model();
         PresentationModel.PresentationModel _pModel;
+        System.Timers.Timer _autoSaveTimer;
 
         public Form1()
         {
             InitializeComponent();
+
+            _autoSaveTimer = new System.Timers.Timer(10000);
+            _autoSaveTimer.Elapsed += AutoSave;
+            _autoSaveTimer.AutoReset = true;
+            _autoSaveTimer.Enabled = true;
 
             _canvas.Parent = this;
             _canvas.Dock = DockStyle.Fill;
@@ -53,6 +59,9 @@ namespace DrawingForm
             _model._addedLineEvent += UpdateView;
             _model._removedLineEvent += UpdateView;
             _model._touchedShapeEvent += UpdateView;
+            _model._saveEvent += RefreshToolStrip;
+            _model._saveFailedEvent += RefreshToolStrip;
+            _model._saveFailedEvent += delegate { MessageBox.Show("存檔失敗 !"); };
 
             this._pModel = new PresentationModel.PresentationModel(_model);
             _pModel._changedModeEvent += RefreshToolStrip;
@@ -158,13 +167,13 @@ namespace DrawingForm
             toolStripLineButton.Checked = _pModel.IsLineEnable;
             toolStripRedoButton.Enabled = _pModel.IsRedoEnable;
             toolStripUndoButton.Enabled = _pModel.IsUndoEnable;
+            toolStripSaveButton.Enabled = _pModel.IsSaveEnable;
         }
 
         private void toolStripStartButton_Click(object sender, EventArgs e)
         {
             _pModel.SetDrawingMode(DrawingMode.START);
         }
-        
 
         private void toolStripTerminatorButton_Click(object sender, EventArgs e)
         {
@@ -239,10 +248,42 @@ namespace DrawingForm
             }
         }
 
+        [STAThread]
         private void toolStripSaveButton_Click(object sender, EventArgs e)
         {
-            _model.Save();
-            
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = "儲存檔案",
+                Filter = "(*.mydrawing)|*.mydrawing|文字檔案(*.txt)|*.txt|所有檔案(*.*)|*.*",
+                DefaultExt = "mydrawing",
+                FileName = "Unnamed"
+            };
+            DialogResult result = saveFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                _model.Save(saveFileDialog.FileName);
+            }  
+        }
+
+        [STAThread]
+        private void toolStripLoadButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "選擇檔案",
+                Filter = "(*.mydrawing)|*.mydrawing|文字檔案(*.txt)|*.txt|所有檔案(*.*)|*.*",
+                Multiselect = false
+            };
+            DialogResult result = openFileDialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                _model.Load(openFileDialog.FileName);
+            }
+        }
+
+        private void AutoSave(object sender, ElapsedEventArgs e)
+        {
+            _model.AutoSave();
         }
     }
 }

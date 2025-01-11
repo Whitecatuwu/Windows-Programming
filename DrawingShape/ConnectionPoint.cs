@@ -8,6 +8,7 @@ namespace DrawingShape
         int _x;
         int _y;
         int _r;
+        int _seq;
         Shape _shape;
         HashSet<Line> _connectedLines = new HashSet<Line>();
 
@@ -42,12 +43,18 @@ namespace DrawingShape
             get { return _y; }
         }
 
-        public ConnectionPoint(Shape shape, int x, int y, int r)
+        public int Seq
+        {
+            get { return _seq; }
+        }
+
+        public ConnectionPoint(Shape shape, int[] data)
         {
             _shape = shape;
-            this._x = x;
-            this._y = y;
-            this._r = r;
+            this._x = data[0];
+            this._y = data[1];
+            this._r = data[2];
+            this._seq = data[3];
         }
         ~ConnectionPoint()
         {
