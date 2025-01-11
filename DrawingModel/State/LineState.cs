@@ -22,6 +22,7 @@ namespace DrawingState
         int _secondY;
         bool _isPressed = false;
         Line _hint = null;
+        ConnectionPoint _hintFirstPoint = null;
 
         Shape _touchedShape = null;
 
@@ -67,7 +68,7 @@ namespace DrawingState
                     _hint.FirstY = _firstY;
                     _hint.SecondX = _secondX;
                     _hint.SecondY = _secondY;
-                    _hint.ConnectedFirstPoint = point;
+                    _hintFirstPoint = point;
                 }
                 return;
             }
@@ -90,17 +91,18 @@ namespace DrawingState
                 var point = shape.TouchConnectPoint(x, y);
                 
                 if (point == null) continue;
-                if (_hint.ConnectedFirstPoint.CompareTo(point) == 0)
+                if (_hintFirstPoint.CompareTo(point) == 0)
                 {
                     continue;
                 };
                 
-                m.ExeCommand(new AddLineCommand(m, _hint.ConnectedFirstPoint, point, _hint));
+                m.ExeCommand(new AddLineCommand(m, _hintFirstPoint, point, _hint));
                 _selectingCompletedEvent();
                 _hint = null;
+                _hintFirstPoint = null;
                 return;
-            }           
-            _hint.ConnectedFirstPoint.RemoveConnectionLine(_hint);
+            }
+            _hintFirstPoint = null;
             _hint = null;
             _selectingFailedEvent();
         }

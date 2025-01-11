@@ -32,6 +32,12 @@ namespace DrawingCommand
             cmd.Execute();
         }
 
+        public void Reload()
+        {
+            _redo.Clear();
+            _undo.Clear();
+        }
+
         public bool IsRedoEnabled
         {
             get

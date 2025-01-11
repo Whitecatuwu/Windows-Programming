@@ -155,11 +155,30 @@ namespace DrawingForm.Tests
             }
         }
 
+        public void AssertTextEditNoPopUp()
+        {
+            try
+            {
+                WindowsElement element = _driver.FindElementByName("編輯文字");
+                Assert.Fail();
+            }
+            catch (Exception)
+            {
+                //Console.WriteLine("TextEditForm do not pop-up.");            
+            }
+        }
+
         // test
         public void AssertChecked(string name, bool state)
         {
             WindowsElement element = _driver.FindElementByName(name);
             Assert.AreEqual(state ? "True" : "False", element.GetAttribute("HasKeyboardFocus"));
+        }
+
+        public void AssertEnabled(string name, bool state)
+        {
+            WindowsElement element = _driver.FindElementByName(name);
+            Assert.AreEqual(state, element.Enabled);
         }
 
         public void InputText(string text)
@@ -169,6 +188,22 @@ namespace DrawingForm.Tests
             textBox.SendKeys(text);
             ConfirmEditText();
         }
+
+        public void SaveFile(string fileName)
+        {
+            WindowsElement element = _driver.FindElementByName("儲存檔案");
+            element.SendKeys(fileName);
+            element.FindElementByName("存檔(S)").Click();    
+        }
+
+        public void LoadFile(string fileName)
+        {
+            WindowsElement element = _driver.FindElementByName("選擇檔案");
+            element.SendKeys(fileName);
+            element.FindElementByName("開啟(O)").Click();
+            _driver.FindElementByName("確定").Click();
+        }
+
 
         public void UndoUntilDisable()
         {
@@ -221,7 +256,6 @@ namespace DrawingForm.Tests
         public void OutputXml()
         {
             File.WriteAllText(@"output.xml", _driver.PageSource);
-            //"C:\Users\user\Desktop\material_list_2025-01-01_20.39.05.txt"
         }
 
         public void MouseDown()

@@ -17,16 +17,16 @@ namespace DrawingForm
         Panel _canvas = new DoubleBufferedPanel();
         Model _model = new Model();
         PresentationModel.PresentationModel _pModel;
-        System.Timers.Timer _autoSaveTimer;
+        System.Threading.Timer _autoSaveTimer;
+
+        const string TITLE = "DrawingForm";
+        const string SAVING_TITLE = "DrawingForm (Auto Saving...)";
 
         public Form1()
         {
             InitializeComponent();
 
-            _autoSaveTimer = new System.Timers.Timer(10000);
-            _autoSaveTimer.Elapsed += AutoSave;
-            _autoSaveTimer.AutoReset = true;
-            _autoSaveTimer.Enabled = true;
+            _autoSaveTimer = new System.Threading.Timer(AutoSave, null, 0, 30000);
 
             _canvas.Parent = this;
             _canvas.Dock = DockStyle.Fill;
@@ -62,6 +62,9 @@ namespace DrawingForm
             _model._saveEvent += RefreshToolStrip;
             _model._saveFailedEvent += RefreshToolStrip;
             _model._saveFailedEvent += delegate { MessageBox.Show("存檔失敗 !"); };
+            _model._autoSaveEvent += delegate { this.Invoke(new Action(() => this.Text = SAVING_TITLE)); };
+            _model._autoSaveFinishEvent += delegate { this.Invoke(new Action(() => this.Text = TITLE)); };
+            _model._loadEvent += ClearGridView;
 
             this._pModel = new PresentationModel.PresentationModel(_model);
             _pModel._changedModeEvent += RefreshToolStrip;
@@ -100,6 +103,11 @@ namespace DrawingForm
             shapeGridView.Rows.RemoveAt(_model.RemovedShapeIndex);
         }
 
+        private void ClearGridView()
+        {
+            shapeGridView.Rows.Clear();
+        }
+
         private void AddGridViewRow()
         {
             int index = _model.ShapesSize - 1;
@@ -121,11 +129,6 @@ namespace DrawingForm
             string[] row = new string[] { "刪除" }.Concat(_pModel.GetShapeData(index)).ToArray();
             shapeGridView.Rows.Insert(index, row);
         }
-
-        /*public void HandleClearButtonClick(object sender, System.EventArgs e)
-        {
-            _canvasModel.Clear();
-        }*/
 
         private void HandleCanvasPointerPressed(object sender, MouseEventArgs e)
         {
@@ -155,6 +158,7 @@ namespace DrawingForm
         {
             //Invalidate(true);
             _canvas.Invalidate(true);
+            _model.Changed = true;
         }
 
         private void RefreshToolStrip()
@@ -262,7 +266,7 @@ namespace DrawingForm
             if (result == DialogResult.OK)
             {
                 _model.Save(saveFileDialog.FileName);
-            }  
+            }
         }
 
         [STAThread]
@@ -274,14 +278,21 @@ namespace DrawingForm
                 Filter = "(*.mydrawing)|*.mydrawing|文字檔案(*.txt)|*.txt|所有檔案(*.*)|*.*",
                 Multiselect = false
             };
-            DialogResult result = openFileDialog.ShowDialog();
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+
+            DialogResult result = MessageBox.Show(
+                "將會覆蓋目前進度，且無法撤銷，是否確定要執行該操作？",  // 訊息內容
+                "確認操作",              // 視窗標題
+                MessageBoxButtons.OKCancel, // 按鈕選項
+                MessageBoxIcon.Question     // 圖示樣式
+            );
+
             if (result == DialogResult.OK)
             {
                 _model.Load(openFileDialog.FileName);
             }
         }
-
-        private void AutoSave(object sender, ElapsedEventArgs e)
+        private void AutoSave(object state)
         {
             _model.AutoSave();
         }

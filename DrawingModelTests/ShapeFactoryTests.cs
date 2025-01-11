@@ -1,6 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using DrawingShape;
+using System.Text.RegularExpressions;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace DrawingModel.Tests
 {
@@ -21,6 +24,6 @@ namespace DrawingModel.Tests
             Assert.AreEqual(start.ShapeType, ShapeType.START);
             Assert.AreEqual(terminator.ShapeType, ShapeType.TERMINATOR);
             Assert.ThrowsException<ArgumentException>(() => shapeFactory.CreateShape(ShapeType.NULL, new string[] { "NULL", "0", "0", "0", "0" }));
-        }
+        }  
     }
 }

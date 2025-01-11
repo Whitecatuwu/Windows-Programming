@@ -73,6 +73,7 @@ namespace DrawingShape
         {
             get { return _shapeType; }
         }
+
         public string Text
         {
             set { _text = value; }
@@ -80,6 +81,7 @@ namespace DrawingShape
         }
         public string Id
         {
+            set { _id = value; }
             get { return _id; }
         }
         public int X
@@ -228,11 +230,6 @@ namespace DrawingShape
             }
             return null;
         }
-
-        /*public void SetConnectLine(in int number,Line)
-        {
-            _connectedLines[number]
-        }*/
 
         private void Abjust()
         {

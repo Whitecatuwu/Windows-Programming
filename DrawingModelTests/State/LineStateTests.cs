@@ -70,6 +70,10 @@ namespace DrawingState.Tests
         [TestMethod()]
         public void MouseUpTest()
         {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "200", "200" });
+
             LineState lineState = new LineState();
             lineState.Initialize(m);
             lineState.MouseUp(m, 0, 0); //do nothing
@@ -88,9 +92,11 @@ namespace DrawingState.Tests
             lineState.MouseMove(m, 1, 100);
             lineState.MouseUp(m, 1, 100); // height == 0
 
-            lineState.MouseDown(m, 1, 1);
-            lineState.MouseMove(m, 100, 100);
-            lineState.MouseUp(m, 100, 100);
+            lineState.MouseDown(m, 1, 50);
+            lineState.MouseMove(m, 2, 50);
+            lineState.MouseMove(m, 3, 50);
+            lineState.MouseMove(m, 100, 50);
+            lineState.MouseUp(m, 100, 50);
         }
 
         [TestMethod()]

@@ -13,46 +13,61 @@ namespace DrawingShape.Tests
     public class LineTests
     {
         [TestMethod()]
-        public void LineTest()
+        public void DisconnectTest()
         {
-            Line line = new Line();
-            line.FirstX = 114;
-            line.FirstY = 514;
-            line.SecondX = 191;
-            line.SecondY = 861;
-            Assert.AreEqual(line.FirstX, 114);
-            Assert.AreEqual(line.FirstY, 514);
-            Assert.AreEqual(line.SecondX, 191);
-            Assert.AreEqual(line.SecondY, 861);
+            Shape shape = new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            var point = shape.ConnectionPoints.First();
+            var line = new Line();
+            line.ConnectedFirstPoint = point;
+            line.ConnectedSecondPoint = shape.ConnectionPoints[1];
+            line.Disconnect();
+            Assert.IsNull(line.ConnectedFirstPoint);
+            Assert.IsNull(line.ConnectedSecondPoint);
+        }
 
-            line.ConnectedFirstShape = null;
-            line.ConnectedFirstShapePointNumber = -1;
-            line.ConnectedSecondShape = null;
-            line.ConnectedSecondShapePointNumber = -1;
-
-            line.ConnectedFirstShape = line.ConnectedFirstShape;
-            line.ConnectedFirstShapePointNumber = line.ConnectedFirstShapePointNumber;
-            line.ConnectedSecondShape = line.ConnectedSecondShape;
-            line.ConnectedSecondShapePointNumber = line.ConnectedSecondShapePointNumber;
-
+        [TestMethod()]
+        public void AnotherPointTest()
+        {
+            Shape shape = new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            var point = shape.ConnectionPoints.First();
+            var line = new Line();
+            line.ConnectedFirstPoint = point;
+            line.ConnectedSecondPoint = shape.ConnectionPoints[1];
+            var result = line.AnotherPoint(point).CompareTo(line.ConnectedSecondPoint);
+            Assert.AreEqual(0, result);
         }
 
         [TestMethod()]
         public void DrawTest()
         {
-            Line line = new Line();
-            line.FirstX = 114;
-            line.FirstY = 514;
-            line.SecondX = 191;
-            line.SecondY = 861;
+            var line = new Line();
             line.Draw(new MockGraphics());
         }
 
         [TestMethod()]
         public void IsPointInRangeTest()
         {
-            Line line = new Line();
-            Assert.IsFalse(line.IsPointInRange(0,0));
+            Assert.IsFalse(new Line().IsPointInRange(0, 0));
+        }
+
+        [TestMethod()]
+        public void CompareToTest()
+        {
+            Shape shape = new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            var point = shape.ConnectionPoints.First();
+            var point1 = shape.ConnectionPoints[1];
+            var line = new Line();
+            var line1 = new Line();
+            var line2 = new Line();
+            line.ConnectedFirstPoint = point;
+            line.ConnectedSecondPoint = point1;
+            line1.ConnectedFirstPoint = point1;
+            line1.ConnectedSecondPoint = point;
+            line2.ConnectedFirstPoint = shape.ConnectionPoints[2];
+            line2.ConnectedSecondPoint = shape.ConnectionPoints[3];
+
+            Assert.AreEqual(line.CompareTo(line1), 0);
+            Assert.AreNotEqual(line.CompareTo(line2), 0);
         }
     }
 }

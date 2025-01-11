@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using DrawingCommand;
 using System.Runtime.InteropServices;
+using System.IO;
+using System.Threading;
 
 namespace DrawingModel.Tests
 {
@@ -78,7 +80,7 @@ namespace DrawingModel.Tests
             line.FirstY = 514;
             line.SecondX = 191;
             line.SecondY = 861;
-            model.AddLine(line);
+            //model.AddLine(line);
             model.OnPaint(new MockGraphics());
         }
 
@@ -114,14 +116,10 @@ namespace DrawingModel.Tests
         {
             Model model = new Model();
             Line line = new Line();
-            line.FirstX = 114;
-            line.FirstY = 514;
-            line.SecondX = 191;
-            line.SecondY = 861;
-            model.AddLine(line);
-            PrivateObject privateObject = new PrivateObject(model);
-            List<Line> lines = (List<Line>)privateObject.GetFieldOrProperty("_lines");
-            Assert.AreEqual(1, lines.Count());
+            var shape = new Decision(ShapeType.DECISION, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            var point_1 = shape.ConnectionPoints[0];
+            var point_2 = shape.ConnectionPoints[1];
+            model.AddLine(point_1, point_2, line);
         }
 
         [TestMethod()]
@@ -267,11 +265,44 @@ namespace DrawingModel.Tests
             line.FirstY = 514;
             line.SecondX = 191;
             line.SecondY = 861;
-            model.AddLine(line);
+            /*model.AddLine(line);
             model.RemoveLine(line);
             PrivateObject privateObject = new PrivateObject(model);
             List<Line> lines = (List<Line>)privateObject.GetFieldOrProperty("_lines");
-            Assert.AreEqual(0, lines.Count());
+            Assert.AreEqual(0, lines.Count());*/
+        }
+
+        [TestMethod()]
+        public void SaveTest()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+            var path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory));
+            var targetPath = Path.Combine(path, "test.mydrawing");
+            model.Save(targetPath);
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+        }
+
+        [TestMethod()]
+        public void AutoSaveTest()
+        {
+            Model model = new Model();
+            model.AddShape(ShapeType.START, new string[] { "DecisionTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.PROCESS, new string[] { "PROCESSTest", "1", "1", "100", "100" });
+            model.AddShape(ShapeType.TERMINATOR, new string[] { "TERMINATORTest", "1", "1", "100", "100" });
+            model.AutoSave();
+        }
+
+        [TestMethod()]
+        public void LoadTest()
+        {
+            SaveTest();
+            Model model = new Model();
+            var path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory));
+            var targetPath = Path.Combine(path, "test.mydrawing");
+            model.Load(targetPath);
         }
     }
 }

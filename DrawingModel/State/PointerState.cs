@@ -82,11 +82,12 @@ namespace DrawingState
             }
         }
 
-        public void ClearSelectedShapes()
+        public void ClearSelectedShapes(bool notify=true)
         {
             _selectedShapes.Clear();
             _selectedShapesPrePositions.Clear();
-            _selectedShapeEvent();
+            if (notify)
+                _selectedShapeEvent();
         }
 
         public void MouseMove(Model m, int x, int y)

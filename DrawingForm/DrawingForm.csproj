@@ -58,9 +58,6 @@
     <Compile Include="..\DrawingModel\Command\DeleteShapeCommand.cs">
       <Link>Command\DeleteShapeCommand.cs</Link>
     </Compile>
-    <Compile Include="..\DrawingModel\Command\DrawCommand.cs">
-      <Link>Command\DrawCommand.cs</Link>
-    </Compile>
     <Compile Include="..\DrawingModel\Command\ICommand.cs">
       <Link>Command\ICommand.cs</Link>
     </Compile>

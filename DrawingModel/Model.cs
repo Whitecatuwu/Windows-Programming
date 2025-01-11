@@ -3,11 +3,11 @@ using System.Linq;
 using DrawingShape;
 using DrawingState;
 using DrawingCommand;
-using System.Runtime.InteropServices.ComTypes;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 
 namespace DrawingModel
@@ -34,12 +34,14 @@ namespace DrawingModel
         public event ModelChangedEventHandler _touchedShapeEvent = delegate { };
         public event ModelChangedEventHandler _saveEvent = delegate { };
         public event ModelChangedEventHandler _saveFailedEvent = delegate { };
+        public event ModelChangedEventHandler _autoSaveEvent = delegate { };
+        public event ModelChangedEventHandler _autoSaveFinishEvent = delegate { };
+        public event ModelChangedEventHandler _loadEvent = delegate { };
 
         ShapeFactory _shapeFactory = new ShapeFactory();
         CommandManager _commandManager = new CommandManager();
 
         List<Shape> _shapes = new List<Shape>();
-        List<Line> _lines = new List<Line>();
 
         PointerState _pointerState;
         DrawingState.DrawingState _drawingState;
@@ -52,6 +54,9 @@ namespace DrawingModel
         int _textEditShapeIndex = -1;
 
         bool _saving = false;
+        bool _changed = false;
+
+        const int MAX_BACKUP_COUNT = 5;
 
         public Model()
         {
@@ -74,6 +79,12 @@ namespace DrawingModel
             _lineState._selectingFailedEvent += delegate { _selectingFailedEvent(); };
 
             EnterPointerState();
+        }
+
+        public bool Changed
+        {
+            set { _changed = value; }
+            get { return _changed; }
         }
 
         public IList<Shape> Shapes
@@ -127,7 +138,6 @@ namespace DrawingModel
         {
             _pointerState.Initialize(this);
             _currentState = _pointerState;
-
         }
 
         public void EnterDrawingState(ShapeType shapeType)
@@ -176,10 +186,6 @@ namespace DrawingModel
                     point.DrawLines(_shapes, g);
                 }
             }
-            /*foreach (Line line in _lines)
-            {
-                ((IDrawable)line).Draw(g);
-            }*/
             _currentState.OnPaint(this, g);
         }
 
@@ -308,31 +314,101 @@ namespace DrawingModel
             bool saveSuccess = await task;
             this._saving = false;
 
-            if (saveSuccess)
-            {
-                _saveEvent();
-            }
-            else
-            {
-                _saveFailedEvent();
-            }
+            if (saveSuccess) _saveEvent();
+            else _saveFailedEvent();
         }
 
-        public void AutoSave()
+        async public void AutoSave()
         {
+            if (!_changed) return;
+            _changed = false;
+            _autoSaveEvent();
+
             string solutionPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\"));
             var time = DateTime.Now.ToString("yyyyMMddHHmmss");
-            var targetFolderPath = Path.Combine(solutionPath, "DrawingForm", "bin", "Debug", "drawing_backup");
+            var targetFolderPath = Path.Combine(solutionPath, "DrawingForm", "bin", "Debug", "drawing_backup");         
+
             if (!Directory.Exists(targetFolderPath))
             {
-                Directory.CreateDirectory(targetFolderPath);
+                try { Directory.CreateDirectory(targetFolderPath); }
+                catch (Exception) { return; }
             }
-            var targetPath = Path.Combine(targetFolderPath, $"{time}_bak.mydrawing");
+            
+            var targetPath = Path.Combine(targetFolderPath, $"{time}_bak.mydrawing");     
+
+            Task<bool> task = Task.Run(() =>
+            {
+                try
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(3));
+                    File.WriteAllText(targetPath, GetContent());
+                    DeleteOldestBackup(targetFolderPath);
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            });
+
+            bool saveSuccess = await task;
+            _autoSaveFinishEvent();
         }
 
         public void Load(string path)
         {
+            _pointerState.ClearSelectedShapes(false);
+            _shapes.Clear();
+            _commandManager.Reload();
+            _loadEvent();
 
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+
+            string contents = File.ReadAllText(path);
+            List<string[]> connectionInfos = new List<string[]> { };
+            foreach (var content in contents.Split('\n'))
+            {
+                if (content == "") continue;
+                var result = AnalyzeShapeData(content);
+                ShapeType shapeType = (ShapeType)int.Parse(result[0]);
+                string shapeId = result[1];
+                string[] shapeData = new string[]
+                {
+                    result[2], // text
+                    result[3], // x
+                    result[4], // y
+                    result[5], // h
+                    result[6], // w
+                };
+                var shape = _shapeFactory.CreateShape(shapeType, shapeData);
+                shape.Id = shapeId;
+                AddShape(shape);
+                connectionInfos.Add(new string[]
+                {
+                    result[7],
+                    result[8],
+                    result[9],
+                    result[10],
+                });
+            }
+            for (int i = 0; i < connectionInfos.Count; i++)
+            {
+                var points = _shapes[i].ConnectionPoints;
+                var connectionInfo = connectionInfos[i];
+                for (int j = 0; j < points.Length; j++)
+                {
+                    if (connectionInfo[j] == "") continue;
+                    foreach (var line in connectionInfo[j].Split(','))
+                    {
+                        if (line == "") continue;
+                        string targetID = line.Split('_')[0].Trim();
+                        int anotherPointSeq = int.Parse(line.Split('_')[1].Trim());
+                        var targetShape = _shapes.Find(s => s.Id == targetID);
+                        var anotherPoint = targetShape.ConnectionPoints[anotherPointSeq];
+                        AddLine(points[j], anotherPoint, new Line());
+                    }
+                }
+            }
         }
 
         private string GetContent()
@@ -340,7 +416,7 @@ namespace DrawingModel
             string content = "";
             foreach (var shape in _shapes)
             {
-                content += $"{shape.Id}, {shape.Text}, {shape.X}, {shape.Y}, {shape.Height}, {shape.Width}";
+                content += $"{(int)shape.ShapeType}, {shape.Id}, {shape.Text}, {shape.X}, {shape.Y}, {shape.Height}, {shape.Width}";
                 foreach (var point in shape.ConnectionPoints)
                 {
                     string connectedShapeIds = "";
@@ -358,6 +434,47 @@ namespace DrawingModel
                 content += "\n";
             }
             return content;
+        }
+
+        private List<string> AnalyzeShapeData(string input)
+        {
+            var regex = new Regex(@"([^,\[\]\s]+)(?=\s*,|\s*\[)|\[(.*?)\]");
+            MatchCollection matches = regex.Matches(input);
+            List<string> result = new List<string>();
+
+            foreach (Match match in matches)
+            {
+                if (match.Value.StartsWith("["))
+                {
+                    result.Add(match.Groups[2].Value.Trim());
+                }
+                else
+                {
+                    result.Add(match.Value.Trim());
+                }
+            }
+            return result;
+        }
+        private void DeleteOldestBackup(string backUpDirPath)
+        {
+            if (!Directory.Exists(backUpDirPath)) { return; }
+
+            string[] files = Directory.GetFiles(backUpDirPath);
+            if (files.Length <= MAX_BACKUP_COUNT) { return; }
+
+            var oldestFile = files
+                .Select(file => new FileInfo(file))  // 轉換為 FileInfo 對象
+                .OrderBy(fileInfo => fileInfo.LastWriteTime)  // 按照 LastWriteTime 排序
+                .First();
+
+            try
+            {
+                File.Delete(oldestFile.FullName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"刪除{oldestFile.FullName}時發生錯誤: {ex.Message}");
+            }
         }
     }
 }

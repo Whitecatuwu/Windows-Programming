@@ -71,7 +71,6 @@
     <Compile Include="Command\AddShapeCommand.cs" />
     <Compile Include="Command\CommandManager.cs" />
     <Compile Include="Command\DeleteShapeCommand.cs" />
-    <Compile Include="Command\DrawCommand.cs" />
     <Compile Include="Command\ICommand.cs" />
     <Compile Include="Command\ShapeMoveCommand.cs" />
     <Compile Include="Command\TextChangeCommand.cs" />

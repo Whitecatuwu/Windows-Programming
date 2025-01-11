@@ -10,7 +10,7 @@ namespace DrawingShape
         int _r;
         int _seq;
         Shape _shape;
-        HashSet<Line> _connectedLines = new HashSet<Line>();
+        SortedSet<Line> _connectedLines = new SortedSet<Line>();
 
         public delegate void ConnectionPointChangedEventHandler();
         public event ConnectionPointChangedEventHandler _pointChangeEvent = delegate { };
@@ -87,7 +87,10 @@ namespace DrawingShape
 
         public void AddConnectionLine(Line line)
         {
-            this._connectedLines.Add(line);
+            if(!_connectedLines.Add(line))
+            {
+                line.AnotherPoint(this).RemoveConnectionLine(line);
+            }
             _pointChangeEvent();
         }
         public void RemoveConnectionLine(Line line)

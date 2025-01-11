@@ -48,35 +48,40 @@ namespace DrawingForm.Tests
 
         [TestMethod]
         public void TestBasisRedoUndo()
-        {
+        {       
             BasisRedoUndo();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void TestShapeMoveRedoUndo()
         {
             ShapeMoveRedoUndo();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void TestTextMoveRedoUndo()
         {
             TextMoveRedoUndo();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void TestTextEditUndoRedoUndo()
         {
             TextEditRedoUndo();
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void TestGridViewRedoUndo()
         {
             GridViewRedoUndo();
         }
+        [TestMethod]
+        public void TestSaveLoad()
+        {
+            SaveLoad();
+        }
 
-        //[TestMethod]
+        [TestMethod]
         public void TestMeta()
         {
             _robot.Sleep(0.2);
@@ -97,8 +102,10 @@ namespace DrawingForm.Tests
 
             _robot.Sleep(0.2);
             GridViewRedoUndo();
-            //_robot.UndoUntilDisable();
+            _robot.UndoUntilDisable();
 
+            _robot.Sleep(0.2);
+            SaveLoad();
         }
 
         private void AssertToolBar(string name)
@@ -319,6 +326,49 @@ namespace DrawingForm.Tests
                 _robot.ClickButton("Undo");
                 _robot.AssertDataGridViewRowDataBy("shapeGridView", 0, shapeDataList[j]);
             }
+        }
+        private void SaveLoad()
+        {
+            string fileName = new Random().Next().ToString();
+
+            DrawStart(0);
+            DrawTerminator(1);
+            DrawLine();
+            DrawProcess(2);
+            DrawDecision(3);
+
+            _robot.ClickButton("Save");        
+            _robot.SaveFile(fileName);
+            _robot.AssertEnabled("Save", false);
+
+            _robot.MoveToElement("Start");
+            _robot.MouseMove(200, 100);
+            _robot.MouseMove(100, 90);
+            _robot.MouseDoubleClick();
+            _robot.AssertTextEditPopUp();
+
+            _robot.Sleep(2);
+            _robot.AssertEnabled("Save", true);
+
+            _robot.UndoUntilDisable();
+
+            _robot.ClickButton("Load");
+            _robot.LoadFile(fileName);
+
+            /*PS:UI暫停時，機器人本身也不會動*/
+
+            /*_robot.MoveToElement("Start");
+            _robot.MouseMove(200, 100);
+            _robot.MouseMove(100, 90);
+            _robot.MouseDoubleClick();
+            _robot.AssertTextEditPopUp();*/
+
+            _robot.AssertDataGridViewRowDataBy("shapeGridView", 0, new string[] { "Start", "220", "139", "200", "200" });
+            _robot.AssertDataGridViewRowDataBy("shapeGridView", 1, new string[] { "Terminator", "245", "239", "210", "410" });
+            _robot.AssertDataGridViewRowDataBy("shapeGridView", 2, new string[] { "Process", "269", "339", "230", "230" });
+            _robot.AssertDataGridViewRowDataBy("shapeGridView", 3, new string[] { "Decision", "492", "339", "240", "240" });
+                
+
         }
     }
 }
